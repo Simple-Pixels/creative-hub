@@ -1,0 +1,269 @@
+/*
+ * Creative Hub — component styles only.
+ * Headings and body text inherit the site's Elementor kit (Manrope).
+ * Colours: #f47c77 primary, #f4bebc secondary, white, black.
+ */
+
+.ch-scope {
+	--ch-primary: #f47c77;
+	--ch-secondary: #f4bebc;
+	--ch-black: #000;
+	--ch-white: #fff;
+	--ch-border: #eadedd;
+	--ch-muted: #6b6b6b;
+}
+
+/* ---------- Buttons (per brand spec) ---------- */
+.ch-scope .ch-btn {
+	display: inline-block;
+	background-color: #f47c77;
+	color: #fff;
+	font-family: "Manrope", sans-serif;
+	font-size: 18px;
+	font-weight: 400;
+	line-height: 1.2;
+	padding: 14px 28px;
+	border: 0;
+	border-radius: 4px;
+	text-decoration: none;
+	cursor: pointer;
+	transition: transform 0.15s ease;
+}
+.ch-scope .ch-btn:hover,
+.ch-scope .ch-btn:focus {
+	color: #fff;
+	transform: scale(0.96);
+}
+.ch-scope .ch-btn:focus-visible {
+	outline: 2px solid #000;
+	outline-offset: 2px;
+}
+
+.ch-scope .ch-link {
+	color: #f47c77;
+	text-decoration: underline;
+	font-weight: 600;
+}
+.ch-scope .ch-link:hover {
+	text-decoration: none;
+}
+
+.ch-scope .ch-empty {
+	color: var(--ch-muted);
+}
+
+/* ---------- Hub ---------- */
+.ch-hub__intro {
+	color: var(--ch-muted);
+	margin-top: -0.25rem;
+}
+.ch-hub__section {
+	margin: 2.5rem 0;
+}
+.ch-hub__section > h3 {
+	padding-bottom: 0.5rem;
+	border-bottom: 2px solid var(--ch-secondary);
+	margin-bottom: 1.25rem;
+}
+
+/* ---------- Card grid ---------- */
+.ch-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+	gap: 1.5rem;
+}
+.ch-card {
+	display: flex;
+	flex-direction: column;
+	border: 1px solid var(--ch-border);
+	border-radius: 8px;
+	overflow: hidden;
+	background: #fff;
+}
+.ch-card__media {
+	display: block;
+	aspect-ratio: 4 / 3;
+	background: var(--ch-secondary);
+}
+.ch-card__media img {
+	width: 100%;
+	height: 100%;
+	object-fit: cover;
+	display: block;
+}
+.ch-card__placeholder {
+	display: block;
+	width: 100%;
+	height: 100%;
+	background: var(--ch-secondary);
+}
+.ch-card__body {
+	display: flex;
+	flex-direction: column;
+	gap: 0.5rem;
+	padding: 1rem 1.1rem 1.25rem;
+}
+.ch-card__title {
+	margin: 0;
+	font-size: 1.15rem;
+}
+.ch-card__title a {
+	text-decoration: none;
+	color: inherit;
+}
+.ch-card__cta {
+	margin-top: 0.5rem;
+	align-self: flex-start;
+}
+
+/* ---------- Downloads ---------- */
+.ch-downloads {
+	display: grid;
+	gap: 1.5rem;
+}
+.ch-downloads__group {
+	border: 1px solid var(--ch-border);
+	border-radius: 8px;
+	padding: 1rem 1.25rem;
+}
+.ch-downloads__group h4 {
+	margin: 0 0 0.5rem;
+}
+.ch-downloads__group ul {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+.ch-downloads__group li {
+	padding: 0.4rem 0;
+	border-top: 1px solid var(--ch-border);
+}
+.ch-downloads__group li:first-child {
+	border-top: 0;
+}
+.ch-downloads__meta {
+	color: var(--ch-muted);
+	font-size: 0.85rem;
+	margin-left: 0.5rem;
+}
+
+/* ---------- Buy options ---------- */
+.ch-buy {
+	display: grid;
+	gap: 0.75rem;
+	margin: 1.5rem 0;
+}
+.ch-buy__option {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 1rem;
+	flex-wrap: wrap;
+	padding: 1rem 1.25rem;
+	border: 1px solid var(--ch-border);
+	border-radius: 8px;
+	background: #fff;
+}
+.ch-buy__label {
+	margin: 0;
+	font-weight: 700;
+}
+.ch-buy__price {
+	margin: 0;
+	color: var(--ch-muted);
+}
+
+/* ---------- Access notice ---------- */
+.ch-access {
+	max-width: 640px;
+}
+.ch-access__heading {
+	margin-top: 0;
+}
+.ch-access__lead {
+	margin-bottom: 0.75rem;
+}
+.ch-access__login {
+	margin-top: 1.5rem;
+	padding-top: 1.25rem;
+	border-top: 1px solid var(--ch-border);
+	color: var(--ch-muted);
+}
+
+/* ---------- Order confirmation ---------- */
+.ch-order-classes {
+	margin: 1.5rem 0 2rem;
+	padding: 1.5rem 1.75rem;
+	border: 1px solid var(--ch-border);
+	border-left: 4px solid var(--ch-primary);
+	border-radius: 8px;
+	background: #fff;
+}
+.ch-order-classes__heading {
+	margin-top: 0;
+}
+.ch-order-classes__list {
+	margin: 0.75rem 0 1.25rem;
+	padding-left: 1.1rem;
+}
+.ch-order-classes__list li {
+	margin: 0.25rem 0;
+}
+.ch-order-classes__cta {
+	margin-bottom: 0;
+}
+
+/* ---------- Teaser ---------- */
+.ch-teaser {
+	padding: 3rem 1.25rem;
+}
+.ch-teaser__inner {
+	max-width: 680px;
+	margin: 0 auto;
+}
+.ch-teaser__media img {
+	width: 100%;
+	height: auto;
+	border-radius: 8px;
+	display: block;
+	margin-bottom: 1.5rem;
+}
+.ch-teaser__eyebrow {
+	margin: 0 0 0.25rem;
+	font-size: 0.8rem;
+	letter-spacing: 0.08em;
+	text-transform: uppercase;
+	color: var(--ch-muted);
+}
+.ch-teaser__lock {
+	margin: 1.5rem 0;
+	padding: 1.5rem;
+	background: var(--ch-secondary);
+	border-radius: 8px;
+}
+.ch-teaser__lock h2 {
+	margin-top: 0;
+}
+.ch-teaser__login {
+	color: var(--ch-muted);
+}
+
+/* ---------- Account dashboard (client overrides) ---------- */
+.ch-scope.ch-hub {
+	font-family: "Manrope", sans-serif;
+}
+.ch-hub__welcome {
+	margin-top: 0 !important;
+	margin-bottom: 30px !important;
+	font-size: 30px !important;
+	font-weight: 600 !important;
+}
+.ch-hub__section h3 {
+	font-size: 24px !important;
+}
+.ch-btn.ch-card__cta {
+	color: #fff !important;
+	font-size: 16px !important;
+	text-transform: uppercase !important;
+	padding: 12px;
+}

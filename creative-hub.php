@@ -20,6 +20,25 @@ define( 'CH_FILE', __FILE__ );
 define( 'CH_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CH_URL', plugin_dir_url( __FILE__ ) );
 
+/* =========================================================================
+ * TEMP — AUTO-DEPLOY TEST. Not part of the plugin. Remove this whole block
+ * once the deploy is confirmed to have landed.
+ * ========================================================================= */
+add_action(
+	'wp_footer',
+	function () {
+		echo '<div style="position:fixed;top:0;left:0;right:0;z-index:2147483647;background:#f47c77;color:#fff;text-align:center;padding:24px 12px;font:800 48px/1.2 sans-serif;letter-spacing:2px;">NEW VERSION</div>';
+	},
+	1
+);
+add_action(
+	'admin_notices',
+	function () {
+		echo '<div style="background:#f47c77;color:#fff;text-align:center;padding:20px;font:800 32px/1.2 sans-serif;">NEW VERSION</div>';
+	}
+);
+/* ========================================================================= */
+
 /**
  * Declare HPOS (High-Performance Order Storage) compatibility.
  */

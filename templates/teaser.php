@@ -26,10 +26,7 @@ $message  = ch_get_setting( 'locked_message', '' );
 		<?php endif; ?>
 
 		<p class="ch-teaser__eyebrow">
-			<?php
-			$terms = get_the_terms( $class_id, 'ch_class_type' );
-			echo esc_html( ( $terms && ! is_wp_error( $terms ) ) ? $terms[0]->name : __( 'Class', 'creative-hub' ) );
-			?>
+			<?php esc_html_e( 'Class', 'creative-hub' ); ?>
 		</p>
 
 		<h1 class="ch-teaser__title"><?php echo esc_html( get_the_title( $class_id ) ); ?></h1>

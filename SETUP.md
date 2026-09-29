@@ -3,7 +3,7 @@
 What this build covers (phase 1):
 
 - A **Classes** content type, editable in Elementor, separate from the product page.
-- Linking each class to one or more **WooCommerce products** (e.g. an "online only" product and a "with kit" product).
+- Linking each class to one or more **Studio Sessions** WooCommerce products. Products in other collections (*Curated Kits*, *Kit Classes*, …) are sold as normal products and never unlock a class.
 - **Gating**: a class page shows its full content only to customers who bought a linked product. Everyone else is sent to your **Access page** (or, if you don't set one, sees a built-in teaser).
 - A **Creative Hub** area on the *My Account* **Dashboard** tab (`/my-account/`) where customers see their classes, retreat bookings and downloads without digging through emails. Also available as `[creative_hub]` for a standalone page.
 - The **order confirmation screen** names the class(es) just bought and links straight to them and to the hub. No setup — it appears whenever an order contains a class-linked product.
@@ -20,7 +20,7 @@ Retreats, retreat content and teacher fees are **not** in this build.
 
 On activation the plugin automatically:
 
-- registers the **Classes** post type (`ch_class`) at `/classes/…` and a **Class Types** taxonomy with three terms: *Online Class*, *Kit Class*, *Free Resource*;
+- registers the **Classes** post type (`ch_class`) at `/classes/…`;
 - registers the `creative-hub` My Account endpoint;
 - adds **Classes** to Elementor's list of editable post types;
 - creates the settings record with sensible defaults (access granted on *Processing* + *Completed*).
@@ -41,7 +41,7 @@ Now you have two ways to design class pages:
 
 1. **Templates → Theme Builder → Single Post → Add New**.
 2. Editor type: **Single**. Design the layout (title, featured image, content area, sidebar, etc.).
-3. **Display Conditions → Include → Classes** (optionally narrow to a Class Type).
+3. **Display Conditions → Include → Classes**.
 4. Publish. Every class now renders through this template for customers who have access.
 
 ### Option B — Free Elementor (design each class page individually)
@@ -79,13 +79,19 @@ If a class isn't purchasable, the buy block is skipped and just the log-in line 
 
 ## 4. Create the products
 
-Nothing special — they are ordinary WooCommerce products. The class link is what matters.
+They are ordinary WooCommerce products. What they do depends on which collection term they carry (checked in the `collection` taxonomy, product tags and product categories):
 
-- **Online class with downloads:** Product → tick **Virtual** and **Downloadable** → add the PDFs / templates / cut files under *Downloadable files*. These appear in the customer's hub automatically.
-- **Online class with a posted kit:** Product → leave **Virtual unticked** (so it needs shipping) → set weight/dimensions and stock. You can still attach downloadable files to the same product. Access unlocks at **Processing** (payment received), so the customer can start the class immediately while the kit is in the post.
-- Selling the same class both ways = **two products**. Link both to the class (step 5).
+| Term | Behaviour |
+|---|---|
+| `curated-kits` | Normal product — nothing extra. |
+| `kit-classes` | Normal product — nothing extra. |
+| `studio-sessions` | Can be linked to a Class (step 5); buying it unlocks that class. |
 
-Set prices, tax and shipping classes as usual.
+- **Studio Session with downloads:** tick **Virtual** and **Downloadable** and add the PDFs / templates / cut files under *Downloadable files*. These appear in the customer's hub automatically.
+- **Studio Session that ships something:** leave **Virtual unticked** so it needs shipping. Access unlocks at **Processing** (payment received), so the customer can start the class while the parcel is in the post.
+- Selling the same class two ways = **two Studio Sessions products**. Link both to the class.
+
+Set prices, tax and shipping classes as usual. If a linked product later loses the `studio-sessions` term, it stops unlocking the class straight away (and starts again if the term is added back).
 
 ---
 
@@ -94,13 +100,11 @@ Set prices, tax and shipping classes as usual.
 1. **Classes → Add New**.
 2. Title, and set a **Featured image** (used on hub cards and the teaser).
 3. **Excerpt** — one or two lines, shown on the teaser.
-4. **Class Types** — pick *Online Class*, *Kit Class*, or *Free Resource*.
-   *Free Resource* classes are open to any logged-in customer with no purchase.
-5. **Access — linked products** (right-hand box) — search and add every product that should unlock this class. The "Fulfilment check" underneath shows which linked products ship a kit vs. are digital only, so you can sanity-check.
-6. Add the content (Gutenberg or **Edit with Elementor**): lesson steps, embedded video, etc.
-7. Publish.
+4. **Access — linked products** (right-hand box) — search and add every **Studio Sessions** product that should unlock this class. The "Studio Sessions check" underneath flags any linked product that isn't tagged `studio-sessions` — those won't unlock the class until they are.
+5. Add the content (Gutenberg or **Edit with Elementor**): lesson steps, embedded video, etc.
+6. Publish.
 
-> A class with **no** linked products is locked for everyone — the admin list shows a red warning in the *Access products* column.
+> A class with **no** linked Studio Sessions products is locked for everyone — the admin list shows a red warning in the *Access products* column.
 
 **Video:** paste a Vimeo/YouTube/Bunny embed into the class content. Host private videos on Vimeo (domain-private) or Bunny Stream — don't upload them to the Media Library. (Signed per-view video URLs are a later phase.)
 
@@ -192,6 +196,8 @@ Access is tied to a **customer account**, because a guest order has no user to a
 |---|---|---|
 | `ch_access_statuses` | filter | Order statuses that grant access |
 | `ch_class_product_ids` | filter | Products that unlock a class |
+| `ch_studio_session_term` | filter | Product term that makes a product able to unlock classes (default `studio-sessions`) |
+| `ch_studio_session_taxonomies` | filter | Taxonomies checked for that term (default `collection`, `product_tag`, `product_cat`) |
 | `ch_user_can_access_class` | filter | Final yes/no access decision |
 | `ch_user_class_ids` | filter | The list of a user's accessible class IDs |
 | `ch_retreat_taxonomy` / `ch_retreat_term` | filter | Which product taxonomy + term counts as a retreat (default `collection` / `retreats`) |

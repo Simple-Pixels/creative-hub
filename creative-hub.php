@@ -1,8 +1,8 @@
 <?php
 /**
  * Plugin Name:       Creative Hub
- * Description:        Post-purchase members area for online classes. Adds a "Classes" content type (Elementor-editable), links classes to WooCommerce products, gates class pages by purchase, and gives customers a tidy view of what they own.
- * Version:           0.4.0
+ * Description:        Post-purchase members area for online classes. Adds a "Classes" content type (Elementor-editable), links classes to Studio Sessions products, gates class pages by purchase, and gives customers a tidy view of what they own.
+ * Version:           0.5.0
  * Requires at least:  6.2
  * Requires PHP:       7.4
  * Author:            Scrapping Clearly
@@ -15,7 +15,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'CH_VERSION', '0.4.0' );
+define( 'CH_VERSION', '0.5.0' );
 define( 'CH_FILE', __FILE__ );
 define( 'CH_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CH_URL', plugin_dir_url( __FILE__ ) );
@@ -87,7 +87,6 @@ add_action(
 		}
 		if ( class_exists( 'CH_Post_Types' ) ) {
 			CH_Post_Types::register_post_type();
-			CH_Post_Types::register_taxonomy();
 			CH_Account::register_endpoint();
 			flush_rewrite_rules();
 		}
@@ -108,7 +107,6 @@ function ch_activate() {
 	require_once CH_PATH . 'includes/class-ch-account.php';
 
 	CH_Post_Types::register_post_type();
-	CH_Post_Types::register_taxonomy();
 	CH_Account::register_endpoint();
 
 	// Default settings.
@@ -136,13 +134,6 @@ function ch_activate() {
 	if ( ! in_array( 'ch_class', $cpt_support, true ) ) {
 		$cpt_support[] = 'ch_class';
 		update_option( 'elementor_cpt_support', $cpt_support );
-	}
-
-	// Seed the class-type terms.
-	foreach ( array( 'Online Class', 'Kit Class', 'Free Resource' ) as $term ) {
-		if ( ! term_exists( $term, 'ch_class_type' ) ) {
-			wp_insert_term( $term, 'ch_class_type' );
-		}
 	}
 
 	flush_rewrite_rules();

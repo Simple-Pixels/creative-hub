@@ -1,6 +1,6 @@
 <?php
 /**
- * Registers the "Classes" post type and its "Class type" taxonomy.
+ * Registers the "Classes" post type.
  *
  * @package CreativeHub
  */
@@ -11,7 +11,6 @@ class CH_Post_Types {
 
 	public static function init() {
 		add_action( 'init', array( __CLASS__, 'register_post_type' ) );
-		add_action( 'init', array( __CLASS__, 'register_taxonomy' ) );
 
 		add_filter( 'manage_ch_class_posts_columns', array( __CLASS__, 'admin_columns' ) );
 		add_action( 'manage_ch_class_posts_custom_column', array( __CLASS__, 'admin_column_content' ), 10, 2 );
@@ -54,32 +53,6 @@ class CH_Post_Types {
 		);
 	}
 
-	public static function register_taxonomy() {
-		$labels = array(
-			'name'          => __( 'Class Types', 'creative-hub' ),
-			'singular_name' => __( 'Class Type', 'creative-hub' ),
-			'all_items'     => __( 'All Class Types', 'creative-hub' ),
-			'edit_item'     => __( 'Edit Class Type', 'creative-hub' ),
-			'view_item'     => __( 'View Class Type', 'creative-hub' ),
-			'add_new_item'  => __( 'Add New Class Type', 'creative-hub' ),
-			'new_item_name' => __( 'New Class Type Name', 'creative-hub' ),
-			'menu_name'     => __( 'Class Types', 'creative-hub' ),
-		);
-
-		register_taxonomy(
-			'ch_class_type',
-			'ch_class',
-			array(
-				'labels'            => $labels,
-				'public'            => true,
-				'hierarchical'      => true,
-				'show_admin_column' => true,
-				'show_in_rest'      => true,
-				'rewrite'           => array( 'slug' => 'class-type' ),
-			)
-		);
-	}
-
 	/* ---------------- Admin list table ---------------- */
 
 	public static function admin_columns( $columns ) {
@@ -100,7 +73,7 @@ class CH_Post_Types {
 
 		$ids = ch_get_class_product_ids( $post_id );
 		if ( empty( $ids ) ) {
-			echo '<span style="color:#b32d2e;">' . esc_html__( 'Not linked — page is locked for everyone', 'creative-hub' ) . '</span>';
+			echo '<span style="color:#b32d2e;">' . esc_html__( 'No Studio Sessions product linked — page is locked for everyone', 'creative-hub' ) . '</span>';
 			return;
 		}
 

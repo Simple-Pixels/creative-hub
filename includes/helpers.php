@@ -38,15 +38,66 @@ function ch_get_access_statuses() {
 }
 
 /**
- * Product IDs that unlock a given class.
+ * Taxonomies checked for the Studio Sessions term. The store may file it
+ * under its "collection" taxonomy, product tags or product categories.
+ *
+ * @return string[]
+ */
+function ch_get_studio_session_taxonomies() {
+	return (array) apply_filters( 'ch_studio_session_taxonomies', array( 'collection', 'product_tag', 'product_cat' ) );
+}
+
+/**
+ * Is this product a Studio Session, i.e. one that can unlock classes?
+ * Products in other collections (curated-kits, kit-classes, …) behave as
+ * ordinary WooCommerce products.
+ *
+ * @param int $product_id Product or variation ID.
+ * @return bool
+ */
+function ch_is_studio_session_product( $product_id ) {
+	$product_id = absint( $product_id );
+	if ( ! $product_id ) {
+		return false;
+	}
+
+	// Variations carry no terms of their own — check the parent.
+	$parent_id = wp_get_post_parent_id( $product_id );
+	if ( $parent_id && 'product_variation' === get_post_type( $product_id ) ) {
+		$product_id = $parent_id;
+	}
+
+	$term = apply_filters( 'ch_studio_session_term', 'studio-sessions' );
+
+	foreach ( ch_get_studio_session_taxonomies() as $taxonomy ) {
+		if ( taxonomy_exists( $taxonomy ) && has_term( $term, $taxonomy, $product_id ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Every product linked to a class in the editor, whether or not it is
+ * currently a Studio Session. Use ch_get_class_product_ids() for access.
+ *
+ * @param int $class_id Class post ID.
+ * @return int[]
+ */
+function ch_get_linked_product_ids( $class_id ) {
+	$ids = get_post_meta( $class_id, '_ch_access_product_ids', true );
+	$ids = is_array( $ids ) ? array_map( 'absint', $ids ) : array();
+	return array_values( array_filter( array_unique( $ids ) ) );
+}
+
+/**
+ * Product IDs that unlock a given class — linked products that are Studio Sessions.
  *
  * @param int $class_id Class post ID.
  * @return int[]
  */
 function ch_get_class_product_ids( $class_id ) {
-	$ids = get_post_meta( $class_id, '_ch_access_product_ids', true );
-	$ids = is_array( $ids ) ? array_map( 'absint', $ids ) : array();
-	$ids = array_values( array_filter( array_unique( $ids ) ) );
+	$ids = array_values( array_filter( ch_get_linked_product_ids( $class_id ), 'ch_is_studio_session_product' ) );
 
 	/**
 	 * Filter the products that unlock a class.
@@ -117,6 +168,9 @@ function ch_rebuild_product_class_index() {
  * @return int[]
  */
 function ch_get_classes_for_product( $product_id ) {
+	if ( ! ch_is_studio_session_product( $product_id ) ) {
+		return array();
+	}
 	$index = ch_get_product_class_index();
 	return isset( $index[ $product_id ] ) ? array_values( array_unique( $index[ $product_id ] ) ) : array();
 }
@@ -134,13 +188,8 @@ function ch_user_can_access_class( $class_id, $user_id = null ) {
 
 	$can = null;
 
-	// Free Resource classes are open to any logged-in user.
-	if ( has_term( 'free-resource', 'ch_class_type', $class_id ) && $user_id ) {
-		$can = true;
-	}
-
 	// Shop managers / editors can preview locked pages.
-	if ( is_null( $can ) && ch_get_setting( 'admin_preview', 1 ) && $user_id && user_can( $user_id, 'edit_others_pages' ) ) {
+	if ( ch_get_setting( 'admin_preview', 1 ) && $user_id && user_can( $user_id, 'edit_others_pages' ) ) {
 		$can = true;
 	}
 
@@ -190,24 +239,7 @@ function ch_get_user_class_ids( $user_id = null ) {
 		}
 	}
 
-	// Free resources the user can always see.
-	$free = get_posts(
-		array(
-			'post_type'     => 'ch_class',
-			'numberposts'   => -1,
-			'fields'        => 'ids',
-			'no_found_rows' => true,
-			'tax_query'     => array(
-				array(
-					'taxonomy' => 'ch_class_type',
-					'field'    => 'slug',
-					'terms'    => 'free-resource',
-				),
-			),
-		)
-	);
-
-	$class_ids = array_values( array_unique( array_merge( $class_ids, array_map( 'absint', $free ) ) ) );
+	$class_ids = array_values( array_unique( $class_ids ) );
 
 	return apply_filters( 'ch_user_class_ids', $class_ids, $user_id );
 }

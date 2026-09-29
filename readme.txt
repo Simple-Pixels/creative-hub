@@ -5,7 +5,7 @@ Tested up to: 6.6
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 9.3
-Stable tag: 0.4.0
+Stable tag: 0.5.0
 License: GPLv2 or later
 
 Post-purchase members area for online classes, built on WooCommerce.
@@ -15,7 +15,7 @@ Post-purchase members area for online classes, built on WooCommerce.
 Phase 1:
 
 * "Classes" post type, editable in Elementor, separate from the product page.
-* Link each class to one or more WooCommerce products (online-only and with-kit).
+* Link each class to one or more Studio Sessions WooCommerce products.
 * Class pages are gated: full content for buyers, a teaser with buy buttons for everyone else.
 * A "Creative Hub" area (My Account tab + optional standalone page) showing the
   customer's classes and downloads.
@@ -32,6 +32,13 @@ See SETUP.md in the plugin folder.
 4. Configure under Classes > Settings.
 
 == Changelog ==
+
+= 0.5.0 =
+* Removed the Class Types taxonomy (Online Class / Kit Class / Free Resource),
+  including the "Free Resource = open to any logged-in user" rule.
+* Only products tagged `studio-sessions` unlock classes. Curated Kits and Kit
+  Classes products behave as normal WooCommerce products.
+* Class editor flags linked products that aren't Studio Sessions.
 
 = 0.4.0 =
 * The Creative Hub now lives on the My Account "Dashboard" tab (the separate

@@ -2,6 +2,9 @@
 /**
  * The link between a Class and the WooCommerce product(s) that unlock it.
  *
+ * Only products in the Studio Sessions collection unlock classes; anything
+ * else (curated kits, kit classes, …) is sold as an ordinary product.
+ *
  * - Meta box on the Class editor to pick "Access products".
  * - Read-only panel on the product editor showing which classes it unlocks.
  *
@@ -21,6 +24,9 @@ class CH_Product_Link {
 		add_action( 'deleted_post', array( __CLASS__, 'on_delete' ) );
 		add_action( 'trashed_post', array( __CLASS__, 'on_delete' ) );
 		add_action( 'untrashed_post', array( __CLASS__, 'on_delete' ) );
+
+		// A product gaining or losing the Studio Sessions term changes what it unlocks.
+		add_action( 'set_object_terms', array( __CLASS__, 'on_product_terms' ), 10, 4 );
 	}
 
 	public static function enqueue( $hook ) {
@@ -57,9 +63,9 @@ class CH_Product_Link {
 	public static function render_class_box( $post ) {
 		wp_nonce_field( 'ch_save_class', 'ch_class_nonce' );
 
-		$ids = ch_get_class_product_ids( $post->ID );
+		$ids = ch_get_linked_product_ids( $post->ID );
 		?>
-		<p><?php esc_html_e( 'Customers who buy any of these products get access to this class. Add both the "online only" and "with kit" products if you sell it both ways.', 'creative-hub' ); ?></p>
+		<p><?php esc_html_e( 'Customers who buy any of these products get access to this class. Only products in the Studio Sessions collection unlock classes.', 'creative-hub' ); ?></p>
 		<select
 			class="wc-product-search"
 			multiple="multiple"
@@ -83,7 +89,7 @@ class CH_Product_Link {
 		</select>
 
 		<?php if ( ! empty( $ids ) ) : ?>
-			<p style="margin-top:10px;"><strong><?php esc_html_e( 'Fulfilment check', 'creative-hub' ); ?></strong></p>
+			<p style="margin-top:10px;"><strong><?php esc_html_e( 'Studio Sessions check', 'creative-hub' ); ?></strong></p>
 			<ul style="margin:0;list-style:disc;padding-left:18px;">
 				<?php
 				foreach ( $ids as $id ) {
@@ -91,10 +97,15 @@ class CH_Product_Link {
 					if ( ! $product ) {
 						continue;
 					}
-					$type = $product->needs_shipping()
-						? __( 'ships a kit', 'creative-hub' )
-						: __( 'digital only', 'creative-hub' );
-					printf( '<li>%s — <em>%s</em></li>', esc_html( $product->get_name() ), esc_html( $type ) );
+					if ( ch_is_studio_session_product( $id ) ) {
+						printf( '<li>%s — <em>%s</em></li>', esc_html( $product->get_name() ), esc_html__( 'unlocks this class', 'creative-hub' ) );
+					} else {
+						printf(
+							'<li>%s — <em style="color:#b32d2e;">%s</em></li>',
+							esc_html( $product->get_name() ),
+							esc_html__( 'not in Studio Sessions, won\'t unlock', 'creative-hub' )
+						);
+					}
 				}
 				?>
 			</ul>
@@ -103,6 +114,11 @@ class CH_Product_Link {
 	}
 
 	public static function render_product_box( $post ) {
+		if ( ! ch_is_studio_session_product( $post->ID ) ) {
+			echo '<p>' . esc_html__( 'Only products in the Studio Sessions collection can unlock classes. This product is sold as a normal product.', 'creative-hub' ) . '</p>';
+			return;
+		}
+
 		$class_ids = ch_get_classes_for_product( $post->ID );
 
 		if ( empty( $class_ids ) ) {
@@ -138,6 +154,12 @@ class CH_Product_Link {
 
 	public static function on_delete( $post_id ) {
 		if ( 'ch_class' === get_post_type( $post_id ) ) {
+			ch_rebuild_product_class_index();
+		}
+	}
+
+	public static function on_product_terms( $object_id, $terms, $tt_ids, $taxonomy ) {
+		if ( 'product' === get_post_type( $object_id ) && in_array( $taxonomy, ch_get_studio_session_taxonomies(), true ) ) {
 			ch_rebuild_product_class_index();
 		}
 	}

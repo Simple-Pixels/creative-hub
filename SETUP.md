@@ -105,7 +105,7 @@ Put `[ch_gallery]` where you want the gallery — in the product page template, 
 
 Change that image any time under **Classes → Settings → Curated kits** (choose from the media library, or paste a URL; "Remove image" turns it off). The same image appears on the order confirmation screen whenever a curated kit is bought.
 
-The gallery is a crossfading slider: arrows appear when you hover the main image (always visible on touch screens), a counter sits bottom-right, and you can also click a thumbnail, swipe, or use the arrow keys. The main image is shown whole (`contain`) in a portrait **3:4** frame (width:height); thumbnails sit underneath and are cropped to fill (`cover`). Use `ratio="4/3"` for a landscape frame or `fit="cover"` to fill the main frame instead. Fine-tune with CSS variables on `.ch-gallery` (e.g. `--ch-gal-radius`, `--ch-gal-thumb`, `--ch-gal-thumb-fit`). It respects reduced-motion settings.
+The gallery is a crossfading slider: arrows appear when you hover the main image (always visible on touch screens), a counter sits bottom-right, and you can also click a thumbnail, swipe, or use the arrow keys. The main image is shown whole (`contain`) in a square **1:1** frame with no border; thumbnails sit underneath and are cropped to fill (`cover`). Use `ratio="3/4"` for a portrait frame, `ratio="4/3"` for landscape, or `fit="cover"` to fill the main frame instead. Fine-tune with CSS variables on `.ch-gallery` (e.g. `--ch-gal-radius`, `--ch-gal-thumb`, `--ch-gal-thumb-fit`). It respects reduced-motion settings.
 
 **Click the main image** to open a lightbox showing the full-size file. Use the arrows, swipe or ← → to move between images, Esc or ✕ to close, and click the picture (or the magnifier button) to zoom to full size — then drag to pan. The lightbox also works when there is only one image.
 
@@ -230,7 +230,7 @@ Access is tied to a **customer account**, because a guest order has no user to a
 | `[ch_my_classes]` | Grid of the visitor's accessible classes |
 | `[ch_my_retreats]` | The visitor's retreat bookings (collection = `retreats`), with payment status, balance and a Pay balance link |
 | `[ch_my_downloads]` | The visitor's downloadable files, grouped by class |
-| `[ch_gallery]` | Image gallery for the current product or class (`product_id="123"` to target one; `fit="cover"` and `ratio="4/3"` optional; default frame is 3/4 portrait). Click the main image for a zoomable lightbox. Curated kits get the kit image added at the end. |
+| `[ch_gallery]` | Image gallery for the current product or class (`product_id="123"` to target one; `fit="cover"` and `ratio="3/4"` optional; default frame is 1/1 square). Click the main image for a zoomable lightbox. Curated kits get the kit image added at the end. |
 | `[ch_class_products]` | Buy options for the current class (`class_id="123"` to target another) |
 | `[ch_access_notice]` | "You don't have access" notice for the Access page — buy links + log-in link (reads `?ch_class=123`) |
 | `[ch_locked]…[/ch_locked]` | Inner content shown only to customers with access |

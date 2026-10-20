@@ -4,14 +4,13 @@
 */
 
 .ch-gallery {
-	--ch-gal-ratio: 3/4;
+	--ch-gal-ratio: 1/1;
 	--ch-gal-fit: contain;
 	--ch-gal-thumb-fit: cover;
 	--ch-gal-radius: 22px;
 	--ch-gal-thumb: 84px;
 	--ch-gal-gap: 12px;
 	--ch-gal-bg: #fff;
-	--ch-gal-border: #eadedd;
 	--ch-gal-accent: var(--ch-primary, #f47c77);
 	--ch-gal-ink: #000;
 	--ch-gal-speed: 0.45s;
@@ -32,7 +31,6 @@
 	overflow: hidden;
 	border-radius: var(--ch-gal-radius);
 	background: var(--ch-gal-bg);
-	box-shadow: inset 0 0 0 1px var(--ch-gal-border);
 	touch-action: pan-y;
 }
 
@@ -215,7 +213,6 @@
 	overflow: hidden;
 	border-radius: calc(var(--ch-gal-radius) * 0.55) !important;
 	background: var(--ch-gal-bg) !important;
-	box-shadow: inset 0 0 0 1px var(--ch-gal-border) !important;
 	scroll-snap-align: center;
 	opacity: 0.55;
 	transition: opacity 0.25s ease, transform 0.25s ease;

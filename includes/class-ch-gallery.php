@@ -1,6 +1,6 @@
 <?php
 /**
- * [ch_gallery] — image gallery: large crossfading portrait image with thumbnails
+ * [ch_gallery] — image gallery: large crossfading square image with thumbnails
  * underneath, hover arrows, a counter, and a lightbox with zoom when the main
  * image is clicked.
  *
@@ -10,7 +10,7 @@
  *
  * Works on a product, or on a Class (using the class's featured image and its
  * linked product's gallery). Pass product_id="123" to point at a specific product.
- * Optional: fit="contain|cover" and ratio="3/4" (width/height).
+ * Optional: fit="contain|cover" and ratio="1/1" (width/height).
  *
  * @package CreativeHub
  */
@@ -111,7 +111,7 @@ class CH_Gallery {
 			array(
 				'product_id' => 0,
 				'fit'        => 'contain',
-				'ratio'      => '3/4',
+				'ratio'      => '1/1',
 			),
 			$atts,
 			'ch_gallery'
@@ -123,7 +123,7 @@ class CH_Gallery {
 		}
 
 		$fit   = 'cover' === strtolower( (string) $atts['fit'] ) ? 'cover' : 'contain';
-		$ratio = preg_match( '#^\d+(\.\d+)?\s*/\s*\d+(\.\d+)?$#', trim( (string) $atts['ratio'] ) ) ? trim( (string) $atts['ratio'] ) : '3/4';
+		$ratio = preg_match( '#^\d+(\.\d+)?\s*/\s*\d+(\.\d+)?$#', trim( (string) $atts['ratio'] ) ) ? trim( (string) $atts['ratio'] ) : '1/1';
 
 		// Featured image first, then the product's own image and gallery.
 		$attachment_ids = array( (int) get_post_thumbnail_id( $main_post_id ) );

@@ -5,7 +5,7 @@ Tested up to: 6.6
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 9.3
-Stable tag: 0.6.1
+Stable tag: 0.6.2
 License: GPLv2 or later
 
 Post-purchase members area for online classes, built on WooCommerce.
@@ -32,6 +32,11 @@ See SETUP.md in the plugin folder.
 4. Configure under Classes > Settings.
 
 == Changelog ==
+
+= 0.6.2 =
+* `[ch_gallery]`: default frame is now square (1:1). `ratio="3/4"` still gives portrait.
+* `[ch_gallery]`: removed the thin outline around the main image and thumbnails. It
+  was painted underneath the picture, so it only showed in the gaps and looked broken.
 
 = 0.6.1 =
 * Fixed: on phones the gallery could sit on top of the content below it (title,

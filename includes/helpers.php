@@ -120,7 +120,7 @@ function ch_default_kit_image_url() {
  *
  * @param int    $attachment_id Attachment ID.
  * @param string $alt_override  Alt text to use instead of the attachment's own.
- * @return array|null Keys: src, srcset, thumb, alt, width, height.
+ * @return array|null Keys: src, full, srcset, thumb, alt, width, height.
  */
 function ch_image_item( $attachment_id, $alt_override = '' ) {
 	$attachment_id = absint( $attachment_id );
@@ -139,8 +139,12 @@ function ch_image_item( $attachment_id, $alt_override = '' ) {
 		? $alt_override
 		: trim( (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) );
 
+	// The original upload, for the lightbox.
+	$original = wp_get_attachment_image_src( $attachment_id, 'full' );
+
 	return array(
 		'src'    => $full[0],
+		'full'   => $original ? $original[0] : $full[0],
 		'width'  => (int) $full[1],
 		'height' => (int) $full[2],
 		'srcset' => (string) wp_get_attachment_image_srcset( $attachment_id, 'large' ),
@@ -175,6 +179,7 @@ function ch_get_curated_kit_image() {
 	if ( ! $item && '' !== $url ) {
 		$item = array(
 			'src'    => $url,
+			'full'   => $url,
 			'width'  => 0,
 			'height' => 0,
 			'srcset' => '',

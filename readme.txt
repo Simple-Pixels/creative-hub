@@ -5,7 +5,7 @@ Tested up to: 6.6
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 9.3
-Stable tag: 0.6.0
+Stable tag: 0.6.1
 License: GPLv2 or later
 
 Post-purchase members area for online classes, built on WooCommerce.
@@ -32,6 +32,18 @@ See SETUP.md in the plugin folder.
 4. Configure under Classes > Settings.
 
 == Changelog ==
+
+= 0.6.1 =
+* Fixed: on phones the gallery could sit on top of the content below it (title,
+  price, Add to Cart) inside Elementor layouts. The browser sized the gallery's
+  wrapper without knowing its width, so the wrapper collapsed. The gallery script
+  now keeps a pixel min-height in sync with the gallery's real height, and the
+  gallery stylesheet loads in the head on product and class pages.
+* `[ch_gallery]`: default frame is now portrait 3:4, thumbnails sit underneath
+  (cropped to fill, `cover`) instead of on the right.
+* `[ch_gallery]`: clicking the main image opens a lightbox with the full-size
+  image — prev/next, Esc to close, swipe, focus kept inside, and click (or the
+  zoom button) to zoom to full size with drag-to-pan. Also works for a single image.
 
 = 0.6.0 =
 * Fixed: a locked class page stayed covered by the open mini-cart for logged-out

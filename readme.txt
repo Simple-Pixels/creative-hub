@@ -39,9 +39,9 @@ See SETUP.md in the plugin folder.
   has initialised, instead of being printed from `template_redirect`.
 * Teaser is 1550px wide, says "Studio Sessions" in its header, and the default
   heading now reads "This studio session is waiting for you".
-* New: `[ch_gallery]` coverflow image gallery (featured image, then the product
-  gallery, thumbnails underneath). Curated Kits products get the curated-kit image
-  appended at the end.
+* New: `[ch_gallery]` image gallery (featured image, then the product gallery;
+  thumbnails on the right, hover arrows, counter bottom-right, images shown whole
+  with `contain`). Curated Kits products get the curated-kit image appended at the end.
 * New: Classes → Settings → "Curated kits" tab to choose that image from the media library.
 * The curated-kit image also appears on the order confirmation screen.
 * My retreats now shows each booking with payment status, paid and balance

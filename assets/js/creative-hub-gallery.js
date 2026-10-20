@@ -1,167 +1,140 @@
-/**
- * Creative Hub coverflow gallery.
- * Vanilla JS, no dependencies. Handles arrows, thumbnails, swipe, keyboard.
- */
-(function () {
+/* Creative Hub — image gallery ([ch_gallery]) */
+( function () {
 	'use strict';
 
-	var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-
-	function init(root) {
-		if (!root || root.getAttribute('data-ch-ready')) {
+	function Gallery( root ) {
+		this.root = root;
+		this.slides = Array.prototype.slice.call( root.querySelectorAll( '.ch-gallery__slide' ) );
+		this.thumbs = Array.prototype.slice.call( root.querySelectorAll( '.ch-gallery__thumb' ) );
+		this.counter = root.querySelector( '[data-ch-gal-current]' );
+		this.strip = root.querySelector( '.ch-gallery__thumbs' );
+		this.index = 0;
+		if ( this.slides.length < 2 ) {
 			return;
 		}
-		root.setAttribute('data-ch-ready', '1');
+		this.bind();
+	}
 
-		var stage = root.querySelector('.ch-gallery__stage');
-		var slides = Array.prototype.slice.call(root.querySelectorAll('.ch-gallery__slide'));
-		var thumbs = Array.prototype.slice.call(root.querySelectorAll('.ch-gallery__thumb'));
-		var thumbBar = root.querySelector('.ch-gallery__thumbs');
-		var prev = root.querySelector('.ch-gallery__nav--prev');
-		var next = root.querySelector('.ch-gallery__nav--next');
-		var status = root.querySelector('.ch-gallery__status');
-		var count = slides.length;
-		var current = 0;
-
-		if (count < 2 || !stage) {
+	Gallery.prototype.go = function ( i, focusThumb ) {
+		var n = this.slides.length;
+		i = ( i + n ) % n; // loop
+		if ( i === this.index ) {
 			return;
 		}
+		this.index = i;
 
-		function render() {
-			slides.forEach(function (slide, i) {
-				var offset = i - current;
-				var abs = Math.abs(offset);
-				slide.style.setProperty('--o', Math.max(-3, Math.min(3, offset)));
-				slide.style.setProperty('--abs', Math.min(abs, 3));
-				slide.style.zIndex = String(100 - abs);
-				slide.classList.toggle('is-active', offset === 0);
-				slide.classList.toggle('is-far', abs > 2);
-				slide.setAttribute('aria-hidden', offset === 0 ? 'false' : 'true');
-			});
+		this.slides.forEach( function ( s, k ) {
+			var on = k === i;
+			s.classList.toggle( 'is-active', on );
+			if ( on ) {
+				s.removeAttribute( 'aria-hidden' );
+			} else {
+				s.setAttribute( 'aria-hidden', 'true' );
+			}
+		} );
 
-			thumbs.forEach(function (thumb, i) {
-				var active = i === current;
-				thumb.classList.toggle('is-active', active);
-				if (active) {
-					thumb.setAttribute('aria-current', 'true');
-				} else {
-					thumb.removeAttribute('aria-current');
-				}
-			});
+		this.thumbs.forEach( function ( t, k ) {
+			var on = k === i;
+			t.classList.toggle( 'is-active', on );
+			t.setAttribute( 'aria-selected', on ? 'true' : 'false' );
+			t.tabIndex = on ? 0 : -1;
+		} );
 
-			if (prev) {
-				prev.disabled = current === 0;
-			}
-			if (next) {
-				next.disabled = current === count - 1;
-			}
-			if (status) {
-				status.textContent = (current + 1) + ' / ' + count;
-			}
-
-			// Keep the active thumbnail in view without scrolling the page.
-			var active = thumbs[current];
-			if (active && thumbBar && thumbBar.scrollWidth > thumbBar.clientWidth) {
-				var left = active.offsetLeft - (thumbBar.clientWidth - active.offsetWidth) / 2;
-				if (thumbBar.scrollTo) {
-					thumbBar.scrollTo({ left: left, behavior: reduceMotion ? 'auto' : 'smooth' });
-				} else {
-					thumbBar.scrollLeft = left;
-				}
-			}
+		if ( this.counter ) {
+			this.counter.textContent = i + 1;
 		}
 
-		function go(index) {
-			var target = Math.max(0, Math.min(count - 1, index));
-			if (target === current) {
+		// Keep the active thumb in view (scrolls the strip only, not the page)
+		var thumb = this.thumbs[ i ];
+		if ( thumb && this.strip ) {
+			var vertical = this.strip.scrollHeight > this.strip.clientHeight + 1;
+			if ( vertical ) {
+				var top = thumb.offsetTop - this.strip.offsetTop - ( this.strip.clientHeight - thumb.offsetHeight ) / 2;
+				this.strip.scrollTo( { top: top, behavior: 'smooth' } );
+			} else {
+				var left = thumb.offsetLeft - this.strip.offsetLeft - ( this.strip.clientWidth - thumb.offsetWidth ) / 2;
+				this.strip.scrollTo( { left: left, behavior: 'smooth' } );
+			}
+			if ( focusThumb ) {
+				thumb.focus( { preventScroll: true } );
+			}
+		}
+	};
+
+	Gallery.prototype.bind = function () {
+		var self = this;
+
+		this.root.querySelector( '[data-ch-gal-prev]' ).addEventListener( 'click', function () {
+			self.go( self.index - 1 );
+		} );
+		this.root.querySelector( '[data-ch-gal-next]' ).addEventListener( 'click', function () {
+			self.go( self.index + 1 );
+		} );
+
+		this.thumbs.forEach( function ( t, k ) {
+			t.tabIndex = k === 0 ? 0 : -1;
+			t.addEventListener( 'click', function () {
+				self.go( k );
+			} );
+		} );
+
+		// Arrow keys when the gallery has focus
+		this.root.addEventListener( 'keydown', function ( e ) {
+			var inStrip = self.strip && self.strip.contains( document.activeElement );
+			if ( e.key === 'ArrowLeft' || e.key === 'ArrowUp' ) {
+				e.preventDefault();
+				self.go( self.index - 1, inStrip );
+			}
+			if ( e.key === 'ArrowRight' || e.key === 'ArrowDown' ) {
+				e.preventDefault();
+				self.go( self.index + 1, inStrip );
+			}
+		} );
+
+		// Swipe on the main image
+		var stage = this.root.querySelector( '.ch-gallery__stage' );
+		var x0 = null;
+		var y0 = null;
+		stage.addEventListener( 'touchstart', function ( e ) {
+			x0 = e.touches[ 0 ].clientX;
+			y0 = e.touches[ 0 ].clientY;
+		}, { passive: true } );
+		stage.addEventListener( 'touchend', function ( e ) {
+			if ( x0 === null ) {
 				return;
 			}
-			current = target;
-			render();
-		}
+			var dx = e.changedTouches[ 0 ].clientX - x0;
+			var dy = e.changedTouches[ 0 ].clientY - y0;
+			if ( Math.abs( dx ) > 40 && Math.abs( dx ) > Math.abs( dy ) ) {
+				self.go( self.index + ( dx < 0 ? 1 : -1 ) );
+			}
+			x0 = y0 = null;
+		}, { passive: true } );
+	};
 
-		if (prev) {
-			prev.addEventListener('click', function () { go(current - 1); });
-		}
-		if (next) {
-			next.addEventListener('click', function () { go(current + 1); });
-		}
-
-		thumbs.forEach(function (thumb, i) {
-			thumb.addEventListener('click', function () { go(i); });
-		});
-
-		// Click a neighbouring slide to bring it to the centre.
-		var suppressClick = false;
-		slides.forEach(function (slide, i) {
-			slide.addEventListener('click', function () {
-				if (!suppressClick) {
-					go(i);
-				}
-			});
-		});
-
-		// Swipe / drag.
-		var startX = null;
-		stage.addEventListener('pointerdown', function (e) {
-			if (e.pointerType === 'mouse' && e.button !== 0) {
+	function boot( scope ) {
+		( scope || document ).querySelectorAll( '[data-ch-gallery]' ).forEach( function ( el ) {
+			if ( el.__chGal ) {
 				return;
 			}
-			startX = e.clientX;
-		});
-		stage.addEventListener('pointerup', function (e) {
-			if (startX === null) {
-				return;
-			}
-			var delta = e.clientX - startX;
-			startX = null;
-			if (Math.abs(delta) > 40) {
-				go(current + (delta < 0 ? 1 : -1));
-				suppressClick = true;
-				window.setTimeout(function () { suppressClick = false; }, 0);
-			}
-		});
-		stage.addEventListener('pointercancel', function () { startX = null; });
-		stage.addEventListener('pointerleave', function () { startX = null; });
-
-		// Keyboard.
-		stage.addEventListener('keydown', function (e) {
-			if (e.key === 'ArrowLeft') {
-				e.preventDefault();
-				go(current - 1);
-			} else if (e.key === 'ArrowRight') {
-				e.preventDefault();
-				go(current + 1);
-			} else if (e.key === 'Home') {
-				e.preventDefault();
-				go(0);
-			} else if (e.key === 'End') {
-				e.preventDefault();
-				go(count - 1);
-			}
-		});
-
-		root.classList.add('is-ready');
-		render();
+			el.__chGal = new Gallery( el );
+		} );
 	}
 
-	function initAll(scope) {
-		var nodes = (scope || document).querySelectorAll('[data-ch-gallery]');
-		Array.prototype.forEach.call(nodes, init);
-	}
-
-	if (document.readyState === 'loading') {
-		document.addEventListener('DOMContentLoaded', function () { initAll(); });
+	if ( document.readyState === 'loading' ) {
+		document.addEventListener( 'DOMContentLoaded', function () {
+			boot();
+		} );
 	} else {
-		initAll();
+		boot();
 	}
 
 	// Elementor re-renders widgets inside its editor; initialise those too.
-	window.addEventListener('elementor/frontend/init', function () {
-		try {
-			window.elementorFrontend.hooks.addAction('frontend/element_ready/shortcode.default', function ($scope) {
-				initAll($scope && $scope[0] ? $scope[0] : document);
-			});
-		} catch (err) { /* not in Elementor */ }
-	});
-})();
+	window.addEventListener( 'elementor/frontend/init', function () {
+		if ( window.elementorFrontend && window.elementorFrontend.hooks ) {
+			window.elementorFrontend.hooks.addAction( 'frontend/element_ready/global', function ( $scope ) {
+				boot( $scope[ 0 ] );
+			} );
+		}
+	} );
+} )();

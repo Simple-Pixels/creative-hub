@@ -132,7 +132,8 @@ function ch_image_item( $attachment_id, $alt_override = '' ) {
 	if ( ! $full ) {
 		return null;
 	}
-	$thumb = wp_get_attachment_image_src( $attachment_id, 'thumbnail' );
+	// "medium" keeps the original proportions; "thumbnail" is hard-cropped square.
+	$thumb = wp_get_attachment_image_src( $attachment_id, 'medium' );
 
 	$alt = '' !== $alt_override
 		? $alt_override

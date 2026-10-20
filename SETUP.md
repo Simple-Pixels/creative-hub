@@ -7,7 +7,7 @@ What this build covers (phase 1):
 - **Gating**: a class page shows its full content only to customers who bought a linked product. Everyone else is sent to your **Access page** (or, if you don't set one, sees a built-in teaser).
 - A **Creative Hub** area on the *My Account* **Dashboard** tab (`/my-account/`) where customers see their classes, retreat bookings and downloads without digging through emails. Also available as `[creative_hub]` for a standalone page.
 - The **order confirmation screen** names the class(es) just bought and links straight to them and to the hub. No setup — it appears whenever an order contains a class-linked product. If the order contains a **Curated Kit**, it also shows the curated-kit image.
-- A **coverflow image gallery** shortcode, `[ch_gallery]`, with thumbnails underneath. Curated Kits products get the curated-kit image added to the end (choose the file under **Classes → Settings → Curated kits**).
+- An **image gallery** shortcode, `[ch_gallery]`, with thumbnails on the right. Curated Kits products get the curated-kit image added to the end (choose the file under **Classes → Settings → Curated kits**).
 - **Retreat bookings** on the hub dashboard, with payment status, balance and a "Pay balance" link when you use *Deposits & Partial Payments for WooCommerce Pro*.
 
 Past-retreat content and teacher fees are **not** in this build.
@@ -98,14 +98,14 @@ Set prices, tax and shipping classes as usual. If a linked product later loses t
 
 Put `[ch_gallery]` where you want the gallery — in the product page template, or in the Class (Single) template in Elementor, using a Shortcode widget.
 
-- **On a product page:** the product's featured image is the main slide, followed by its gallery images. Thumbnails sit underneath.
+- **On a product page:** the product's featured image is the main slide, followed by its gallery images. Thumbnails run down the right-hand side (underneath on phones).
 - **On a Class page:** the class's featured image first, then the images of its first linked product.
 - **Elsewhere:** `[ch_gallery product_id="123"]`.
 - **Curated kits:** if the product is in the **`curated-kits`** collection, the curated-kit image is added as the last slide.
 
 Change that image any time under **Classes → Settings → Curated kits** (choose from the media library, or paste a URL; "Remove image" turns it off). The same image appears on the order confirmation screen whenever a curated kit is bought.
 
-The gallery works with swipe, arrow buttons, thumbnails and the keyboard (← → Home End), shrinks to fit phones, and respects reduced-motion settings.
+The gallery is a crossfading slider: arrows appear when you hover the main image (always visible on touch screens), a counter sits bottom-right, and you can also click a thumbnail, swipe, or use the arrow keys. Images are shown whole (`contain`) in a 4:3 frame; use `fit="cover"` to fill the frame instead, or `ratio="1/1"` to change the frame. Fine-tune with CSS variables on `.ch-gallery` (e.g. `--ch-gal-radius`, `--ch-gal-thumb`). It respects reduced-motion settings.
 
 ---
 
@@ -227,7 +227,7 @@ Access is tied to a **customer account**, because a guest order has no user to a
 | `[ch_my_classes]` | Grid of the visitor's accessible classes |
 | `[ch_my_retreats]` | The visitor's retreat bookings (collection = `retreats`), with payment status, balance and a Pay balance link |
 | `[ch_my_downloads]` | The visitor's downloadable files, grouped by class |
-| `[ch_gallery]` | Coverflow gallery for the current product or class (`product_id="123"` to target one). Curated kits get the kit image added at the end. |
+| `[ch_gallery]` | Image gallery for the current product or class (`product_id="123"` to target one; `fit="cover"` and `ratio="16/9"` optional). Curated kits get the kit image added at the end. |
 | `[ch_class_products]` | Buy options for the current class (`class_id="123"` to target another) |
 | `[ch_access_notice]` | "You don't have access" notice for the Access page — buy links + log-in link (reads `?ch_class=123`) |
 | `[ch_locked]…[/ch_locked]` | Inner content shown only to customers with access |

@@ -318,7 +318,7 @@ class CH_Settings {
 		<p><code>[ch_my_classes]</code> — <?php esc_html_e( 'just the grid of the visitor\'s classes.', 'creative-hub' ); ?></p>
 		<p><code>[ch_my_retreats]</code> — <?php esc_html_e( 'just the visitor\'s retreat bookings, with payment status.', 'creative-hub' ); ?></p>
 		<p><code>[ch_my_downloads]</code> — <?php esc_html_e( 'just the download list, grouped by class.', 'creative-hub' ); ?></p>
-		<p><code>[ch_gallery]</code> — <?php esc_html_e( 'coverflow image gallery for the current product or class (add product_id="123" to target one). Curated kits get the kit image added at the end.', 'creative-hub' ); ?></p>
+		<p><code>[ch_gallery]</code> — <?php esc_html_e( 'image gallery for the current product or class (add product_id="123" to target one). Curated kits get the kit image added at the end.', 'creative-hub' ); ?></p>
 		<p><code>[ch_class_products]</code> — <?php esc_html_e( 'buy options for the current class (use on the teaser).', 'creative-hub' ); ?></p>
 		<p><code>[ch_access_notice]</code> — <?php esc_html_e( 'the "you don\'t have access" notice for the Access page (buy links + log-in link).', 'creative-hub' ); ?></p>
 		<p><code>[ch_locked]…[/ch_locked]</code> / <code>[ch_teaser]…[/ch_teaser]</code> — <?php esc_html_e( 'show content only to buyers / only to non-buyers.', 'creative-hub' ); ?></p>

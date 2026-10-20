@@ -1,7 +1,8 @@
 <?php
 /**
- * [ch_gallery] — image gallery: large crossfading image with a thumbnail column
- * on the right, hover arrows and a counter.
+ * [ch_gallery] — image gallery: large crossfading portrait image with thumbnails
+ * underneath, hover arrows, a counter, and a lightbox with zoom when the main
+ * image is clicked.
  *
  * The featured image is the first slide; the product's gallery images follow.
  * Products in the Curated Kits collection get the curated-kit image (Classes →
@@ -9,7 +10,7 @@
  *
  * Works on a product, or on a Class (using the class's featured image and its
  * linked product's gallery). Pass product_id="123" to point at a specific product.
- * Optional: fit="contain|cover" and ratio="4/3".
+ * Optional: fit="contain|cover" and ratio="3/4" (width/height).
  *
  * @package CreativeHub
  */
@@ -24,11 +25,45 @@ class CH_Gallery {
 	public static function init() {
 		add_shortcode( 'ch_gallery', array( __CLASS__, 'render' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'register' ) );
+		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_early' ), 20 );
+	}
+
+	/**
+	 * The shortcode usually sits in an Elementor template, which can't be seen
+	 * from here. Load the (small) stylesheet in the head on the pages it is used
+	 * on, so the gallery never renders unstyled while the page loads.
+	 */
+	public static function enqueue_early() {
+		/**
+		 * Filter whether the gallery stylesheet loads in the head on products and classes.
+		 *
+		 * @param bool $load Default true.
+		 */
+		if ( is_singular( array( 'product', 'ch_class' ) ) && apply_filters( 'ch_gallery_early_enqueue', true ) ) {
+			wp_enqueue_style( 'creative-hub-gallery' );
+		}
 	}
 
 	public static function register() {
 		wp_register_style( 'creative-hub-gallery', CH_URL . 'assets/css/creative-hub-gallery.css', array(), CH_VERSION );
 		wp_register_script( 'creative-hub-gallery', CH_URL . 'assets/js/creative-hub-gallery.js', array(), CH_VERSION, true );
+	}
+
+	/**
+	 * Text the lightbox script needs, so it can be translated.
+	 *
+	 * @return array<string,string>
+	 */
+	protected static function labels() {
+		return array(
+			'open'    => __( 'View image full screen', 'creative-hub' ),
+			'viewer'  => __( 'Image viewer', 'creative-hub' ),
+			'close'   => __( 'Close', 'creative-hub' ),
+			'prev'    => __( 'Previous image', 'creative-hub' ),
+			'next'    => __( 'Next image', 'creative-hub' ),
+			'zoomIn'  => __( 'Zoom in', 'creative-hub' ),
+			'zoomOut' => __( 'Zoom out', 'creative-hub' ),
+		);
 	}
 
 	/**
@@ -76,7 +111,7 @@ class CH_Gallery {
 			array(
 				'product_id' => 0,
 				'fit'        => 'contain',
-				'ratio'      => '4/3',
+				'ratio'      => '3/4',
 			),
 			$atts,
 			'ch_gallery'
@@ -88,7 +123,7 @@ class CH_Gallery {
 		}
 
 		$fit   = 'cover' === strtolower( (string) $atts['fit'] ) ? 'cover' : 'contain';
-		$ratio = preg_match( '#^\d+(\.\d+)?\s*/\s*\d+(\.\d+)?$#', trim( (string) $atts['ratio'] ) ) ? trim( (string) $atts['ratio'] ) : '4/3';
+		$ratio = preg_match( '#^\d+(\.\d+)?\s*/\s*\d+(\.\d+)?$#', trim( (string) $atts['ratio'] ) ) ? trim( (string) $atts['ratio'] ) : '3/4';
 
 		// Featured image first, then the product's own image and gallery.
 		$attachment_ids = array( (int) get_post_thumbnail_id( $main_post_id ) );
@@ -140,9 +175,8 @@ class CH_Gallery {
 		$multi = $count > 1;
 		++self::$instances;
 
-		if ( $multi ) {
-			wp_enqueue_script( 'creative-hub-gallery' );
-		}
+		// Needed even for a single image: it powers the lightbox.
+		wp_enqueue_script( 'creative-hub-gallery' );
 
 		ob_start();
 		?>
@@ -151,6 +185,7 @@ class CH_Gallery {
 			class="ch-scope ch-gallery<?php echo $multi ? '' : ' is-single'; ?>"
 			style="--ch-gal-ratio: <?php echo esc_attr( $ratio ); ?>; --ch-gal-fit: <?php echo esc_attr( $fit ); ?>;"
 			data-ch-gallery
+			data-ch-labels="<?php echo esc_attr( wp_json_encode( self::labels() ) ); ?>"
 			role="region"
 			aria-roledescription="carousel"
 			aria-label="<?php echo esc_attr( sprintf( /* translators: %s: item title */ __( '%s images', 'creative-hub' ), $alt_fallback ) ); ?>">
@@ -167,6 +202,7 @@ class CH_Gallery {
 						<img
 							class="ch-gallery__img"
 							src="<?php echo esc_url( $item['src'] ); ?>"
+							data-full="<?php echo esc_url( ! empty( $item['full'] ) ? $item['full'] : $item['src'] ); ?>"
 							<?php if ( ! empty( $item['srcset'] ) ) : ?>
 								srcset="<?php echo esc_attr( $item['srcset'] ); ?>"
 								sizes="(max-width: 767px) 100vw, 800px"

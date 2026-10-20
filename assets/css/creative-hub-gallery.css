@@ -1,14 +1,14 @@
-/* Creative Hub — image gallery ([ch_gallery])
+/* Creative Hub — image gallery ([ch_gallery]) and lightbox
    Tweak via variables, e.g. in Elementor custom CSS:
    selector .ch-gallery { --ch-gal-radius: 16px; --ch-gal-thumb: 96px; }
 */
 
 .ch-gallery {
-	--ch-gal-ratio: 4/3;
+	--ch-gal-ratio: 3/4;
 	--ch-gal-fit: contain;
-	--ch-gal-thumb-fit: contain;
+	--ch-gal-thumb-fit: cover;
 	--ch-gal-radius: 22px;
-	--ch-gal-thumb: 88px;
+	--ch-gal-thumb: 84px;
 	--ch-gal-gap: 12px;
 	--ch-gal-bg: #fff;
 	--ch-gal-border: #eadedd;
@@ -17,15 +17,11 @@
 	--ch-gal-speed: 0.45s;
 
 	display: grid;
-	grid-template-columns: minmax(0, 1fr) var(--ch-gal-thumb);
-	grid-template-areas: "stage thumbs";
+	grid-template-columns: minmax(0, 1fr);
+	grid-template-areas: "stage" "thumbs";
+	align-content: start; /* the script sets a pixel min-height; don't stretch rows into it */
 	gap: var(--ch-gal-gap);
 	width: 100%;
-}
-
-.ch-gallery.is-single {
-	grid-template-columns: minmax(0, 1fr);
-	grid-template-areas: "stage";
 }
 
 /* ---- Main image ---- */
@@ -65,6 +61,10 @@
 }
 
 /* ---- Buttons: hard reset against theme / Elementor button styles ---- */
+.ch-gallery button.ch-gallery__open,
+.ch-gallery button.ch-gallery__open:hover,
+.ch-gallery button.ch-gallery__open:focus,
+.ch-gallery button.ch-gallery__open:active,
 .ch-gallery button.ch-gallery__nav,
 .ch-gallery button.ch-gallery__nav:hover,
 .ch-gallery button.ch-gallery__nav:focus,
@@ -72,7 +72,11 @@
 .ch-gallery button.ch-gallery__thumb,
 .ch-gallery button.ch-gallery__thumb:hover,
 .ch-gallery button.ch-gallery__thumb:focus,
-.ch-gallery button.ch-gallery__thumb:active {
+.ch-gallery button.ch-gallery__thumb:active,
+.ch-lightbox button,
+.ch-lightbox button:hover,
+.ch-lightbox button:focus,
+.ch-lightbox button:active {
 	margin: 0 !important;
 	padding: 0 !important;
 	border: 0 !important;
@@ -85,11 +89,47 @@
 	cursor: pointer;
 }
 
+/* Transparent button over the main image: click (or Enter) opens the lightbox */
+.ch-gallery button.ch-gallery__open {
+	position: absolute;
+	inset: 0;
+	z-index: 1;
+	display: block !important;
+	width: 100%;
+	height: 100%;
+	border-radius: inherit !important;
+	background: transparent !important;
+	color: inherit !important;
+	cursor: zoom-in;
+}
+
+.ch-gallery button.ch-gallery__open:focus-visible {
+	outline: 3px solid var(--ch-gal-ink) !important;
+	outline-offset: -3px;
+}
+
+/* Small "zoom" hint, top-right, so it's clear the image opens */
+.ch-gallery__zoom-icon {
+	position: absolute;
+	top: 14px;
+	right: 14px;
+	z-index: 2;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 36px;
+	height: 36px;
+	border-radius: 50%;
+	background: rgba(0, 0, 0, 0.55);
+	color: #fff;
+	pointer-events: none;
+}
+
 /* Prev / next — fade in when the image is hovered */
 .ch-gallery button.ch-gallery__nav {
 	position: absolute;
 	top: 50%;
-	z-index: 2;
+	z-index: 3;
 	display: flex !important;
 	align-items: center;
 	justify-content: center;
@@ -145,21 +185,19 @@
 	font-size: 0.8rem;
 	line-height: 1;
 	font-variant-numeric: tabular-nums;
+	pointer-events: none;
 }
 
-/* ---- Thumbnails (right-hand column) ---- */
+/* ---- Thumbnails (underneath, scroll sideways if there are many) ---- */
 .ch-gallery__thumbs {
 	grid-area: thumbs;
 	display: flex;
-	flex-direction: column;
+	flex-direction: row;
 	gap: var(--ch-gal-gap);
-	/* match the main image's height, scroll if there are more thumbs */
-	height: 0;
-	min-height: 100%;
-	overflow-x: hidden;
-	overflow-y: auto;
-	overscroll-behavior: contain;
-	scroll-snap-type: y proximity;
+	overflow-x: auto;
+	overflow-y: hidden;
+	overscroll-behavior-x: contain;
+	scroll-snap-type: x proximity;
 	scrollbar-width: none;
 	padding: 3px; /* room for the focus/active ring */
 	margin: -3px;
@@ -171,8 +209,8 @@
 
 .ch-gallery button.ch-gallery__thumb {
 	position: relative;
-	flex: 0 0 auto;
-	width: 100%;
+	flex: 0 0 var(--ch-gal-thumb);
+	width: var(--ch-gal-thumb);
 	aspect-ratio: 1;
 	overflow: hidden;
 	border-radius: calc(var(--ch-gal-radius) * 0.55) !important;
@@ -216,28 +254,19 @@
 	border-radius: 0;
 }
 
-/* ---- Small screens / touch: thumbnails move underneath ---- */
+/* ---- Small screens / touch ---- */
 @media (max-width: 767px) {
 	.ch-gallery {
-		--ch-gal-thumb: 68px;
+		--ch-gal-thumb: 64px;
 		--ch-gal-gap: 8px;
 		--ch-gal-radius: 16px;
-		grid-template-columns: minmax(0, 1fr);
-		grid-template-areas: "stage" "thumbs";
 	}
 
-	.ch-gallery__thumbs {
-		flex-direction: row;
-		height: auto;
-		min-height: 0;
-		overflow-x: auto;
-		overflow-y: hidden;
-		scroll-snap-type: x proximity;
-	}
-
-	.ch-gallery button.ch-gallery__thumb {
-		flex: 0 0 var(--ch-gal-thumb);
-		width: var(--ch-gal-thumb);
+	.ch-gallery__zoom-icon {
+		top: 10px;
+		right: 10px;
+		width: 32px;
+		height: 32px;
 	}
 }
 
@@ -249,8 +278,185 @@
 	}
 }
 
+/* =========================================================================
+   Lightbox
+   ========================================================================= */
+
+html.ch-lightbox-open,
+html.ch-lightbox-open body {
+	overflow: hidden;
+}
+
+.ch-lightbox {
+	position: fixed;
+	inset: 0;
+	z-index: 999999;
+	background: rgba(0, 0, 0, 0.92);
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+}
+
+.ch-lightbox.is-open {
+	opacity: 1;
+	visibility: visible;
+	transition: opacity 0.25s ease, visibility 0s;
+}
+
+.ch-lightbox__stage {
+	position: absolute;
+	inset: 0;
+	display: flex;
+	overflow: auto;
+	padding: 64px 16px;
+	overscroll-behavior: contain;
+	-webkit-overflow-scrolling: touch;
+}
+
+.ch-lightbox .ch-lightbox__img {
+	display: block;
+	flex: none;
+	margin: auto;
+	width: auto;
+	height: auto;
+	max-width: calc(100vw - 32px);
+	max-height: calc(100vh - 128px);
+	max-height: calc(100dvh - 128px);
+	object-fit: contain;
+	border-radius: 6px;
+	-webkit-user-select: none;
+	user-select: none;
+}
+
+.ch-lightbox.can-zoom .ch-lightbox__img {
+	cursor: zoom-in;
+}
+
+.ch-lightbox.is-zoomed .ch-lightbox__img {
+	max-width: none;
+	max-height: none;
+	border-radius: 0;
+	cursor: zoom-out;
+}
+
+.ch-lightbox.is-dragging .ch-lightbox__img {
+	cursor: grabbing;
+}
+
+/* Close / zoom */
+.ch-lightbox__tools {
+	position: absolute;
+	top: 14px;
+	right: 14px;
+	z-index: 3;
+	display: flex;
+	gap: 10px;
+}
+
+.ch-lightbox button.ch-lightbox__close,
+.ch-lightbox button.ch-lightbox__zoom,
+.ch-lightbox button.ch-lightbox__nav {
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	width: 44px;
+	height: 44px;
+	border-radius: 50% !important;
+	background: rgba(255, 255, 255, 0.9) !important;
+	color: #000 !important;
+	transition: background-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
+}
+
+.ch-lightbox button.ch-lightbox__close:hover,
+.ch-lightbox button.ch-lightbox__zoom:hover,
+.ch-lightbox button.ch-lightbox__nav:hover {
+	background: #fff !important;
+}
+
+.ch-lightbox button.ch-lightbox__zoom[aria-pressed="true"] {
+	background: var(--ch-primary, #f47c77) !important;
+	color: #fff !important;
+}
+
+.ch-lightbox:not(.can-zoom) button.ch-lightbox__zoom {
+	display: none !important;
+}
+
+.ch-lightbox button.ch-lightbox__nav {
+	position: absolute;
+	top: 50%;
+	z-index: 3;
+	transform: translateY(-50%);
+}
+
+.ch-lightbox__nav--prev {
+	left: 16px;
+}
+.ch-lightbox__nav--next {
+	right: 16px;
+}
+
+.ch-lightbox button.ch-lightbox__nav--prev:hover {
+	transform: translateY(-50%) translateX(-2px);
+}
+.ch-lightbox button.ch-lightbox__nav--next:hover {
+	transform: translateY(-50%) translateX(2px);
+}
+
+.ch-lightbox button:focus-visible {
+	outline: 3px solid #fff !important;
+	outline-offset: 2px;
+}
+
+.ch-lightbox__count {
+	position: absolute;
+	bottom: 18px;
+	left: 50%;
+	z-index: 3;
+	transform: translateX(-50%);
+	padding: 0.4em 0.9em;
+	border-radius: 999px;
+	background: rgba(255, 255, 255, 0.16);
+	color: #fff;
+	font-size: 0.85rem;
+	line-height: 1;
+	font-variant-numeric: tabular-nums;
+	pointer-events: none;
+}
+
+@media (max-width: 767px) {
+	.ch-lightbox__stage {
+		padding: 60px 8px;
+	}
+
+	.ch-lightbox .ch-lightbox__img {
+		max-width: calc(100vw - 16px);
+	}
+
+	.ch-lightbox__tools {
+		top: 10px;
+		right: 10px;
+	}
+
+	.ch-lightbox button.ch-lightbox__close,
+	.ch-lightbox button.ch-lightbox__zoom,
+	.ch-lightbox button.ch-lightbox__nav {
+		width: 40px;
+		height: 40px;
+	}
+
+	.ch-lightbox__nav--prev {
+		left: 8px;
+	}
+	.ch-lightbox__nav--next {
+		right: 8px;
+	}
+}
+
 @media (prefers-reduced-motion: reduce) {
-	.ch-gallery * {
+	.ch-gallery *,
+	.ch-lightbox,
+	.ch-lightbox * {
 		transition: none !important;
 	}
 }

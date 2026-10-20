@@ -5,7 +5,7 @@ Tested up to: 6.6
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 9.3
-Stable tag: 0.5.0
+Stable tag: 0.6.0
 License: GPLv2 or later
 
 Post-purchase members area for online classes, built on WooCommerce.
@@ -32,6 +32,21 @@ See SETUP.md in the plugin folder.
 4. Configure under Classes > Settings.
 
 == Changelog ==
+
+= 0.6.0 =
+* Fixed: a locked class page stayed covered by the open mini-cart for logged-out
+  visitors. The teaser is now loaded through `template_include`, after Elementor
+  has initialised, instead of being printed from `template_redirect`.
+* Teaser is 1550px wide, says "Studio Sessions" in its header, and the default
+  heading now reads "This studio session is waiting for you".
+* New: `[ch_gallery]` coverflow image gallery (featured image, then the product
+  gallery, thumbnails underneath). Curated Kits products get the curated-kit image
+  appended at the end.
+* New: Classes → Settings → "Curated kits" tab to choose that image from the media library.
+* The curated-kit image also appears on the order confirmation screen.
+* My retreats now shows each booking with payment status, paid and balance
+  amounts, next payment date and a "Pay balance" link, using
+  Deposits & Partial Payments for WooCommerce Pro. Partially-paid bookings now appear.
 
 = 0.5.0 =
 * Removed the Class Types taxonomy (Online Class / Kit Class / Free Resource),

@@ -1,7 +1,7 @@
 <?php
 /**
  * Order confirmation ("thank you") screen: point the customer at the class(es)
- * they just bought.
+ * they just bought, and show the curated-kit image if a curated kit is in the order.
  *
  * @package CreativeHub
  */
@@ -37,6 +37,21 @@ class CH_Order {
 		return array_values( array_unique( $class_ids ) );
 	}
 
+	/**
+	 * Does the order contain a product from the Curated Kits collection?
+	 *
+	 * @param WC_Order $order Order object.
+	 * @return bool
+	 */
+	protected static function has_curated_kit( $order ) {
+		foreach ( $order->get_items() as $item ) {
+			if ( is_a( $item, 'WC_Order_Item_Product' ) && ch_is_curated_kit_product( $item->get_product_id() ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public static function thankyou( $order_id ) {
 		$order = wc_get_order( $order_id );
 		if ( ! $order ) {
@@ -44,12 +59,56 @@ class CH_Order {
 		}
 
 		$class_ids = self::class_ids_for_order( $order );
-		if ( empty( $class_ids ) ) {
+		$has_kit   = self::has_curated_kit( $order );
+
+		if ( empty( $class_ids ) && ! $has_kit ) {
 			return;
 		}
 
 		CH_Assets::enqueue_front();
 
+		if ( $class_ids ) {
+			self::render_classes( $order, $class_ids );
+		}
+		if ( $has_kit ) {
+			self::render_kit();
+		}
+	}
+
+	protected static function render_kit() {
+		$kit = ch_get_curated_kit_image();
+		if ( ! $kit ) {
+			return;
+		}
+
+		$alt = '' !== $kit['alt'] ? $kit['alt'] : __( 'Your curated kit', 'creative-hub' );
+		?>
+		<section class="ch-scope ch-order-kit">
+			<h2 class="ch-order-kit__heading"><?php esc_html_e( 'Your curated kit', 'creative-hub' ); ?></h2>
+			<figure class="ch-order-kit__figure">
+				<img
+					src="<?php echo esc_url( $kit['src'] ); ?>"
+					<?php if ( ! empty( $kit['srcset'] ) ) : ?>
+						srcset="<?php echo esc_attr( $kit['srcset'] ); ?>"
+						sizes="(max-width: 900px) 100vw, 900px"
+					<?php endif; ?>
+					<?php if ( ! empty( $kit['width'] ) && ! empty( $kit['height'] ) ) : ?>
+						width="<?php echo esc_attr( $kit['width'] ); ?>"
+						height="<?php echo esc_attr( $kit['height'] ); ?>"
+					<?php endif; ?>
+					alt="<?php echo esc_attr( $alt ); ?>"
+					loading="lazy"
+					decoding="async">
+			</figure>
+		</section>
+		<?php
+	}
+
+	/**
+	 * @param WC_Order $order     Order object.
+	 * @param int[]    $class_ids Classes the order unlocks.
+	 */
+	protected static function render_classes( $order, $class_ids ) {
 		$unlocked = $order->has_status( ch_get_access_statuses() );
 		$is_guest = 0 === (int) $order->get_customer_id();
 		$hub_url  = ch_get_hub_url();

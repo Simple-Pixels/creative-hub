@@ -218,15 +218,23 @@
 	padding: 3rem 1.25rem;
 }
 .ch-teaser__inner {
-	max-width: 680px;
+	width: 100%;
+	max-width: 1550px;
 	margin: 0 auto;
 }
+.ch-teaser__intro {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr);
+	gap: 1.5rem 3rem;
+	align-items: center;
+}
 .ch-teaser__media img {
+	display: block;
 	width: 100%;
 	height: auto;
+	max-height: 560px;
+	object-fit: cover;
 	border-radius: 8px;
-	display: block;
-	margin-bottom: 1.5rem;
 }
 .ch-teaser__eyebrow {
 	margin: 0 0 0.25rem;
@@ -236,16 +244,120 @@
 	color: var(--ch-muted);
 }
 .ch-teaser__lock {
-	margin: 1.5rem 0;
-	padding: 1.5rem;
+	margin: 2rem 0 1.5rem;
+	padding: 1.75rem 2rem;
 	background: var(--ch-secondary);
 	border-radius: 8px;
 }
 .ch-teaser__lock h2 {
 	margin-top: 0;
 }
+.ch-teaser__lock p:last-child {
+	margin-bottom: 0;
+}
+.ch-teaser .ch-buy {
+	max-width: 680px;
+}
 .ch-teaser__login {
 	color: var(--ch-muted);
+}
+@media (min-width: 900px) {
+	.ch-teaser__intro--media {
+		grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+	}
+}
+@media (max-width: 600px) {
+	.ch-teaser {
+		padding: 2rem 1rem;
+	}
+	.ch-teaser__lock {
+		padding: 1.25rem;
+	}
+}
+
+/* ---------- Retreat bookings ---------- */
+.ch-card__meta {
+	margin: 0;
+	font-size: 0.85rem;
+	color: var(--ch-muted);
+}
+.ch-card__actions {
+	display: flex;
+	flex-wrap: wrap;
+	align-items: center;
+	gap: 0.6rem 1rem;
+	margin-top: 0.5rem;
+}
+.ch-card__actions .ch-card__cta {
+	margin-top: 0;
+}
+.ch-card__secondary {
+	font-size: 0.9rem;
+}
+.ch-pill {
+	align-self: flex-start;
+	margin: 0;
+	padding: 0.2rem 0.65rem;
+	border-radius: 999px;
+	font-size: 0.75rem;
+	font-weight: 600;
+	letter-spacing: 0.03em;
+	line-height: 1.4;
+	background: #eee;
+	color: #444;
+}
+.ch-pill--paid {
+	background: #e6f4ea;
+	color: #1c6a39;
+}
+.ch-pill--balance {
+	background: #fde6e5;
+	color: #a8302b;
+}
+.ch-pill--awaiting {
+	background: #f1f1f1;
+	color: #555;
+}
+.ch-pay {
+	display: grid;
+	gap: 0.25rem;
+	margin: 0.25rem 0 0;
+	padding: 0.75rem 0 0;
+	border-top: 1px solid var(--ch-border);
+	font-size: 0.9rem;
+}
+.ch-pay__row {
+	display: flex;
+	justify-content: space-between;
+	gap: 1rem;
+}
+.ch-pay dt {
+	color: var(--ch-muted);
+}
+.ch-pay dd {
+	margin: 0;
+	font-weight: 600;
+	text-align: right;
+}
+
+/* ---------- Order confirmation: curated kit ---------- */
+.ch-order-kit {
+	margin: 1.5rem 0 2rem;
+}
+.ch-order-kit__heading {
+	margin-top: 0;
+}
+.ch-order-kit__figure {
+	margin: 0;
+}
+.ch-order-kit__figure img {
+	display: block;
+	width: 100%;
+	max-width: 900px;
+	height: auto;
+	border: 1px solid var(--ch-border);
+	border-radius: 8px;
+	background: #fff;
 }
 
 /* ---------- Account dashboard (client overrides) ---------- */

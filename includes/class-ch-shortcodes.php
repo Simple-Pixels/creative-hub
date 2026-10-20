@@ -4,7 +4,7 @@
  *
  * [creative_hub]        Full hub: my classes + my retreats + my downloads + link to orders.
  * [ch_my_classes]       Grid of the classes the current user can access.
- * [ch_my_retreats]      Grid of retreat products the current user has bought.
+ * [ch_my_retreats]      The current user's retreat bookings, with payment status.
  * [ch_my_downloads]     The customer's downloadable files, grouped by class.
  * [ch_class_products]   Buy options for the current (or a given) class.
  * [ch_access_notice]    "You don't have access" notice + buy links + login link.
@@ -144,45 +144,19 @@ class CH_Shortcodes {
 			return self::login_prompt();
 		}
 
-		/**
-		 * Retreats are ordinary products in a product taxonomy term. Defaults
-		 * match the store's "collection" taxonomy and its "retreats" term.
-		 */
-		$taxonomy = apply_filters( 'ch_retreat_taxonomy', 'collection' );
-		$term     = apply_filters( 'ch_retreat_term', 'retreats' );
-
-		$purchased   = CH_Entitlements::instance()->get_purchased_product_ids( get_current_user_id() );
-		$retreat_ids = array();
-
-		foreach ( $purchased as $pid ) {
-			$product = wc_get_product( $pid );
-			if ( ! $product ) {
-				continue;
-			}
-			$parent_id = $product->get_parent_id() ? $product->get_parent_id() : $product->get_id();
-			if ( isset( $retreat_ids[ $parent_id ] ) ) {
-				continue;
-			}
-			if ( taxonomy_exists( $taxonomy ) && has_term( $term, $taxonomy, $parent_id ) ) {
-				$retreat_ids[ $parent_id ] = true;
-			}
-		}
-		$retreat_ids = array_keys( $retreat_ids );
+		$bookings = CH_Retreats::get_bookings( get_current_user_id() );
 
 		ob_start();
 		if ( $atts['wrap'] ) {
 			echo '<div class="ch-scope">';
 		}
 
-		if ( empty( $retreat_ids ) ) {
-			echo '<p class="ch-empty">' . esc_html__( 'No retreat bookings yet.', 'creative-hub' ) . '</p>';
+		if ( empty( $bookings ) ) {
+			echo '<p class="ch-empty">' . esc_html__( 'No retreat bookings yet. Once you book a retreat it appears here with your payments, balance and a link to pay what is left.', 'creative-hub' ) . '</p>';
 		} else {
 			echo '<div class="ch-grid">';
-			foreach ( $retreat_ids as $rid ) {
-				$product = wc_get_product( $rid );
-				if ( $product && 'publish' === $product->get_status() ) {
-					echo self::render_product_card( $product ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped
-				}
+			foreach ( $bookings as $booking ) {
+				echo CH_Retreats::render_card( $booking ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside render_card().
 			}
 			echo '</div>';
 		}
@@ -190,29 +164,6 @@ class CH_Shortcodes {
 		if ( $atts['wrap'] ) {
 			echo '</div>';
 		}
-		return ob_get_clean();
-	}
-
-	protected static function render_product_card( $product ) {
-		$permalink = get_permalink( $product->get_id() );
-		$image     = $product->get_image( 'medium_large' );
-
-		ob_start();
-		?>
-		<article class="ch-card">
-			<a class="ch-card__media" href="<?php echo esc_url( $permalink ); ?>">
-				<?php echo wp_kses_post( $image ); ?>
-			</a>
-			<div class="ch-card__body">
-				<h4 class="ch-card__title">
-					<a href="<?php echo esc_url( $permalink ); ?>"><?php echo esc_html( $product->get_name() ); ?></a>
-				</h4>
-				<a class="ch-btn ch-card__cta" href="<?php echo esc_url( $permalink ); ?>">
-					<?php esc_html_e( 'View retreat', 'creative-hub' ); ?>
-				</a>
-			</div>
-		</article>
-		<?php
 		return ob_get_clean();
 	}
 

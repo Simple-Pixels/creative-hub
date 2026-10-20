@@ -6,9 +6,11 @@ What this build covers (phase 1):
 - Linking each class to one or more **Studio Sessions** WooCommerce products. Products in other collections (*Curated Kits*, *Kit Classes*, …) are sold as normal products and never unlock a class.
 - **Gating**: a class page shows its full content only to customers who bought a linked product. Everyone else is sent to your **Access page** (or, if you don't set one, sees a built-in teaser).
 - A **Creative Hub** area on the *My Account* **Dashboard** tab (`/my-account/`) where customers see their classes, retreat bookings and downloads without digging through emails. Also available as `[creative_hub]` for a standalone page.
-- The **order confirmation screen** names the class(es) just bought and links straight to them and to the hub. No setup — it appears whenever an order contains a class-linked product.
+- The **order confirmation screen** names the class(es) just bought and links straight to them and to the hub. No setup — it appears whenever an order contains a class-linked product. If the order contains a **Curated Kit**, it also shows the curated-kit image.
+- A **coverflow image gallery** shortcode, `[ch_gallery]`, with thumbnails underneath. Curated Kits products get the curated-kit image added to the end (choose the file under **Classes → Settings → Curated kits**).
+- **Retreat bookings** on the hub dashboard, with payment status, balance and a "Pay balance" link when you use *Deposits & Partial Payments for WooCommerce Pro*.
 
-Retreats, retreat content and teacher fees are **not** in this build.
+Past-retreat content and teacher fees are **not** in this build.
 
 ---
 
@@ -16,12 +18,11 @@ Retreats, retreat content and teacher fees are **not** in this build.
 
 1. Copy the `creative-hub` folder into `wp-content/plugins/` (or zip it and upload via **Plugins → Add New → Upload**).
 2. **Plugins → Installed Plugins → activate "Creative Hub"**.
-3. Go to **Settings → Permalinks** and click **Save Changes** once. (Activation already flushes the rewrite rules; this is just belt-and-braces so the new `/creative-hub/classes/…` URLs and the My Account tab resolve.)
+3. Go to **Settings → Permalinks** and click **Save Changes** once. (Activation already flushes the rewrite rules; this is just belt-and-braces so the `/classes/…` URLs resolve.)
 
 On activation the plugin automatically:
 
 - registers the **Classes** post type (`ch_class`) at `/classes/…`;
-- registers the `creative-hub` My Account endpoint;
 - adds **Classes** to Elementor's list of editable post types;
 - creates the settings record with sensible defaults (access granted on *Processing* + *Completed*).
 
@@ -72,7 +73,7 @@ If a class isn't purchasable, the buy block is skipped and just the log-in line 
 
 ### Alternatives
 
-- **No Access page set:** the plugin falls back to a built-in teaser template (`templates/teaser.php`) with editable heading/message under **Classes → Settings**. Override it by copying to `wp-content/themes/your-child-theme/creative-hub/teaser.php`.
+- **No Access page set:** the plugin falls back to a built-in teaser template (`templates/teaser.php`) with editable heading/message under **Classes → Settings**. It sits in a 1550px-wide container (image and title side by side on wide screens, stacked on phones) and is labelled "Studio Sessions". The default heading is "This studio session is waiting for you"; if you've typed your own, edit it under **Classes → Settings → Teaser heading**. Override the whole template by copying it to `wp-content/themes/your-child-theme/creative-hub/teaser.php`.
 - **Build the locked/unlocked states inside one Elementor layout:** untick **Auto-lock class pages**, then wrap protected parts in `[ch_locked] … [/ch_locked]` and the pitch in `[ch_teaser] … [/ch_teaser]`.
 
 ---
@@ -92,6 +93,19 @@ They are ordinary WooCommerce products. What they do depends on which collection
 - Selling the same class two ways = **two Studio Sessions products**. Link both to the class.
 
 Set prices, tax and shipping classes as usual. If a linked product later loses the `studio-sessions` term, it stops unlocking the class straight away (and starts again if the term is added back).
+
+### Curated kits and the gallery
+
+Put `[ch_gallery]` where you want the gallery — in the product page template, or in the Class (Single) template in Elementor, using a Shortcode widget.
+
+- **On a product page:** the product's featured image is the main slide, followed by its gallery images. Thumbnails sit underneath.
+- **On a Class page:** the class's featured image first, then the images of its first linked product.
+- **Elsewhere:** `[ch_gallery product_id="123"]`.
+- **Curated kits:** if the product is in the **`curated-kits`** collection, the curated-kit image is added as the last slide.
+
+Change that image any time under **Classes → Settings → Curated kits** (choose from the media library, or paste a URL; "Remove image" turns it off). The same image appears on the order confirmation screen whenever a curated kit is bought.
+
+The gallery works with swipe, arrow buttons, thumbnails and the keyboard (← → Home End), shrinks to fit phones, and respects reduced-motion settings.
 
 ---
 
@@ -120,13 +134,39 @@ If you'd rather also have it as a standalone page (e.g. `/creative-hub`), create
 
 ### Retreats
 
-Retreat cards are driven entirely by your product taxonomy — any product the customer has bought that sits in the **`collection` → `retreats`** term shows as a card linking to the product page. No class or extra setup needed. (Different taxonomy or term? Use the `ch_retreat_taxonomy` / `ch_retreat_term` filters.)
+*My retreats* is driven by your product taxonomy — every order line for a product in the **`collection` → `retreats`** term becomes a booking card. No class or extra setup needed. (Different taxonomy or term? Use the `ch_retreat_taxonomy` / `ch_retreat_term` filters.)
+
+Each card shows the retreat's image and name, the booking (order) number and a status pill:
+
+| Pill | Meaning |
+|---|---|
+| **Paid in full** | Nothing left to pay. Button: *View retreat* (the product page). |
+| **Balance due** | A deposit is in but there's still money to pay. Shows *Paid so far*, *Balance* and *Next payment due* where known, and a **Pay balance** button. |
+| **Awaiting payment** | Booked but the payment hasn't cleared yet (e.g. bank transfer on hold). |
+
+Every card also has a *Booking details* link to the order page, where Deposits & Partial Payments shows the full payment schedule.
+
+**How it works with Deposits & Partial Payments for WooCommerce Pro**
+
+- Bookings in the *Partially Paid* status appear (they previously wouldn't — it isn't an access-granting status). Retreats count in the statuses *Processing, Completed, Partially Paid* and *On hold*; change that with the `ch_retreat_order_statuses` filter.
+- **Pay balance** goes to the booking's payment URL, which the deposits plugin redirects to the next unpaid instalment.
+- Amounts and the next-due date come from the deposits plugin's own order data (its `_awcdp_deposits_*` fields and instalment payment records). If a number can't be worked out it's simply left out; the status pill and Pay balance link still work.
+- This was built from the plugin's published structure rather than a live deposit order, so **place one test retreat booking with a deposit** and check the card. If a figure is missing or wrong, the `ch_retreat_payment_summary` filter is the one place to adjust it.
 
 ---
 
 ## 7. Settings reference
 
-**Classes → Settings**
+**Classes → Settings** has two tabs. Each tab saves on its own without affecting the other.
+
+**Curated kits tab**
+
+| Setting | Notes |
+|---|---|
+| Kit image | The picture appended to curated-kit galleries and shown on the order confirmation screen. Choose from the media library, or paste a URL. Defaults to the Image-1.jpeg uploaded in September 2026. |
+| Alt text | Optional. Blank uses the media library alt text. |
+
+**General tab**
 
 | Setting | Default | Notes |
 |---|---|---|
@@ -174,6 +214,8 @@ Access is tied to a **customer account**, because a guest order has no user to a
 - **"It sent me to wp-login.php"** — fixed in 0.3.1. Update the plugin. Locked class pages now use the Access page, or the teaser, and their log-in links go to `/my-account/`.
 - **Bought a class but it still shows as locked** — check the order status is one of the ticked statuses in **Classes → Settings** (card payments land on *Processing*; bank transfer stays *On hold* until you confirm it). Access refreshes within ~15 minutes or on the order's next status change.
 - **Access page shows the wrong buy links** — it reads `?ch_class=` from the URL; make sure you didn't strip query strings in a redirect or cache rule (see §9).
+- **A locked class page is covered by the open cart and can't be closed (logged out)** — fixed in 0.6.0. The built-in teaser was being printed before Elementor had loaded its scripts, so the header's cart never initialised. It is now loaded through the normal template step.
+- **A retreat booking is missing from *My retreats*** — check the order's status is one of Processing, Completed, Partially Paid or On hold, and that the retreat product is in the `collection` → `retreats` term.
 
 ---
 
@@ -181,10 +223,11 @@ Access is tied to a **customer account**, because a guest order has no user to a
 
 | Shortcode | Output |
 |---|---|
-| `[creative_hub]` | Full hub: my classes + my downloads + order-history link |
+| `[creative_hub]` | Full hub: my classes + my retreats + my downloads + order-history link |
 | `[ch_my_classes]` | Grid of the visitor's accessible classes |
-| `[ch_my_retreats]` | Grid of the visitor's purchased retreat products (collection = `retreats`) |
+| `[ch_my_retreats]` | The visitor's retreat bookings (collection = `retreats`), with payment status, balance and a Pay balance link |
 | `[ch_my_downloads]` | The visitor's downloadable files, grouped by class |
+| `[ch_gallery]` | Coverflow gallery for the current product or class (`product_id="123"` to target one). Curated kits get the kit image added at the end. |
 | `[ch_class_products]` | Buy options for the current class (`class_id="123"` to target another) |
 | `[ch_access_notice]` | "You don't have access" notice for the Access page — buy links + log-in link (reads `?ch_class=123`) |
 | `[ch_locked]…[/ch_locked]` | Inner content shown only to customers with access |
@@ -201,5 +244,11 @@ Access is tied to a **customer account**, because a guest order has no user to a
 | `ch_user_can_access_class` | filter | Final yes/no access decision |
 | `ch_user_class_ids` | filter | The list of a user's accessible class IDs |
 | `ch_retreat_taxonomy` / `ch_retreat_term` | filter | Which product taxonomy + term counts as a retreat (default `collection` / `retreats`) |
+| `ch_retreat_order_statuses` | filter | Order statuses that count as a retreat booking (default access statuses + `partially-paid` + `on-hold`) |
+| `ch_retreat_booking` | filter | A retreat booking (`product`, `order`, `payment`) before it's shown |
+| `ch_retreat_payment_summary` | filter | A booking's payment summary — state, label, paid, balance, next due, pay URL |
+| `ch_curated_kit_term` / `ch_curated_kit_taxonomies` | filter | Which term makes a product a curated kit (default `curated-kits`, in `collection`) |
+| `ch_curated_kit_image` | filter | The curated-kit image description |
+| `ch_gallery_items` | filter | The images `[ch_gallery]` is about to show |
 | `ch_no_access_redirect` | filter | The Access-page URL a no-access visitor is redirected to |
 | `ch_locked_logged_out_redirect` | filter | Where a logged-out visitor is sent when no Access page is set |

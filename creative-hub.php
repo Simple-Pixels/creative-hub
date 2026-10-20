@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Creative Hub
  * Description:        Post-purchase members area for online classes. Adds a "Classes" content type (Elementor-editable), links classes to Studio Sessions products, gates class pages by purchase, and gives customers a tidy view of what they own.
- * Version:           0.5.0
+ * Version:           0.6.0
  * Requires at least:  6.2
  * Requires PHP:       7.4
  * Author:            Scrapping Clearly
@@ -15,7 +15,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'CH_VERSION', '0.5.0' );
+define( 'CH_VERSION', '0.6.0' );
 define( 'CH_FILE', __FILE__ );
 define( 'CH_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CH_URL', plugin_dir_url( __FILE__ ) );
@@ -56,6 +56,8 @@ add_action(
 		require_once CH_PATH . 'includes/class-ch-shortcodes.php';
 		require_once CH_PATH . 'includes/class-ch-account.php';
 		require_once CH_PATH . 'includes/class-ch-order.php';
+		require_once CH_PATH . 'includes/class-ch-retreats.php';
+		require_once CH_PATH . 'includes/class-ch-gallery.php';
 		require_once CH_PATH . 'includes/class-ch-elementor.php';
 		require_once CH_PATH . 'includes/class-ch-settings.php';
 		require_once CH_PATH . 'includes/class-ch-assets.php';
@@ -67,6 +69,7 @@ add_action(
 		CH_Shortcodes::init();
 		CH_Account::init();
 		CH_Order::init();
+		CH_Gallery::init();
 		CH_Elementor::init();
 		CH_Settings::init();
 		CH_Assets::init();
@@ -90,6 +93,15 @@ add_action(
 			CH_Account::register_endpoint();
 			flush_rewrite_rules();
 		}
+
+		// 0.6.0: the teaser says "studio session". Only touch the heading if it is
+		// still the untouched old default, never one someone has written themselves.
+		$settings = get_option( 'ch_settings' );
+		if ( is_array( $settings ) && isset( $settings['locked_heading'] ) && 'This class is waiting for you' === $settings['locked_heading'] ) {
+			$settings['locked_heading'] = 'This studio session is waiting for you';
+			update_option( 'ch_settings', $settings );
+		}
+
 		update_option( 'ch_version', CH_VERSION );
 	}
 );
@@ -117,7 +129,7 @@ function ch_activate() {
 			'auto_gate'        => 1,
 			'admin_preview'    => 1,
 			'buy_button_text'  => 'Get this class',
-			'locked_heading'   => 'This class is waiting for you',
+			'locked_heading'   => 'This studio session is waiting for you',
 			'locked_message'   => 'Purchase this class to unlock the full lesson, videos and downloads. Your access appears here the moment your payment goes through.',
 			'hub_page_id'      => 0,
 			'access_page_id'   => 0,

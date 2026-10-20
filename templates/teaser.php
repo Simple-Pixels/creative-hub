@@ -11,29 +11,34 @@ defined( 'ABSPATH' ) || exit;
 
 get_header();
 
-$class_id = get_queried_object_id();
-$heading  = ch_get_setting( 'locked_heading', __( 'This class is waiting for you', 'creative-hub' ) );
-$message  = ch_get_setting( 'locked_message', '' );
+$class_id  = get_queried_object_id();
+$heading   = ch_get_setting( 'locked_heading', __( 'This studio session is waiting for you', 'creative-hub' ) );
+$message   = ch_get_setting( 'locked_message', '' );
+$has_media = has_post_thumbnail( $class_id );
 ?>
 
 <div class="ch-scope ch-teaser">
 	<div class="ch-teaser__inner">
 
-		<?php if ( has_post_thumbnail( $class_id ) ) : ?>
-			<div class="ch-teaser__media">
-				<?php echo get_the_post_thumbnail( $class_id, 'large' ); ?>
+		<div class="ch-teaser__intro<?php echo $has_media ? ' ch-teaser__intro--media' : ''; ?>">
+			<?php if ( $has_media ) : ?>
+				<div class="ch-teaser__media">
+					<?php echo get_the_post_thumbnail( $class_id, 'large' ); ?>
+				</div>
+			<?php endif; ?>
+
+			<div class="ch-teaser__text">
+				<p class="ch-teaser__eyebrow">
+					<?php esc_html_e( 'Studio Sessions', 'creative-hub' ); ?>
+				</p>
+
+				<h1 class="ch-teaser__title"><?php echo esc_html( get_the_title( $class_id ) ); ?></h1>
+
+				<?php if ( has_excerpt( $class_id ) ) : ?>
+					<p class="ch-teaser__excerpt"><?php echo esc_html( get_the_excerpt( $class_id ) ); ?></p>
+				<?php endif; ?>
 			</div>
-		<?php endif; ?>
-
-		<p class="ch-teaser__eyebrow">
-			<?php esc_html_e( 'Class', 'creative-hub' ); ?>
-		</p>
-
-		<h1 class="ch-teaser__title"><?php echo esc_html( get_the_title( $class_id ) ); ?></h1>
-
-		<?php if ( has_excerpt( $class_id ) ) : ?>
-			<p class="ch-teaser__excerpt"><?php echo esc_html( get_the_excerpt( $class_id ) ); ?></p>
-		<?php endif; ?>
+		</div>
 
 		<div class="ch-teaser__lock">
 			<h2><?php echo esc_html( $heading ); ?></h2>

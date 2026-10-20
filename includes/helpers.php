@@ -78,6 +78,119 @@ function ch_is_studio_session_product( $product_id ) {
 }
 
 /**
+ * Is this product in the Curated Kits collection?
+ *
+ * @param int $product_id Product or variation ID.
+ * @return bool
+ */
+function ch_is_curated_kit_product( $product_id ) {
+	$product_id = absint( $product_id );
+	if ( ! $product_id ) {
+		return false;
+	}
+
+	if ( 'product_variation' === get_post_type( $product_id ) ) {
+		$parent_id = wp_get_post_parent_id( $product_id );
+		if ( $parent_id ) {
+			$product_id = $parent_id;
+		}
+	}
+
+	$term = apply_filters( 'ch_curated_kit_term', 'curated-kits' );
+
+	foreach ( (array) apply_filters( 'ch_curated_kit_taxonomies', array( 'collection' ) ) as $taxonomy ) {
+		if ( taxonomy_exists( $taxonomy ) && has_term( $term, $taxonomy, $product_id ) ) {
+			return true;
+		}
+	}
+	return false;
+}
+
+/**
+ * Image used until someone picks another under Classes → Settings → Curated kits.
+ *
+ * @return string
+ */
+function ch_default_kit_image_url() {
+	return 'https://env-scrappingclearly-premium.kinsta.cloud/wp-content/uploads/2026/09/Image-1.jpeg';
+}
+
+/**
+ * Describe a media-library image for the gallery.
+ *
+ * @param int    $attachment_id Attachment ID.
+ * @param string $alt_override  Alt text to use instead of the attachment's own.
+ * @return array|null Keys: src, srcset, thumb, alt, width, height.
+ */
+function ch_image_item( $attachment_id, $alt_override = '' ) {
+	$attachment_id = absint( $attachment_id );
+	if ( ! $attachment_id || ! wp_attachment_is_image( $attachment_id ) ) {
+		return null;
+	}
+
+	$full = wp_get_attachment_image_src( $attachment_id, 'large' );
+	if ( ! $full ) {
+		return null;
+	}
+	$thumb = wp_get_attachment_image_src( $attachment_id, 'thumbnail' );
+
+	$alt = '' !== $alt_override
+		? $alt_override
+		: trim( (string) get_post_meta( $attachment_id, '_wp_attachment_image_alt', true ) );
+
+	return array(
+		'src'    => $full[0],
+		'width'  => (int) $full[1],
+		'height' => (int) $full[2],
+		'srcset' => (string) wp_get_attachment_image_srcset( $attachment_id, 'large' ),
+		'thumb'  => $thumb ? $thumb[0] : $full[0],
+		'alt'    => $alt,
+	);
+}
+
+/**
+ * The image shown with curated kits (gallery + order confirmation), as chosen
+ * under Classes → Settings → Curated kits.
+ *
+ * @return array|null Same shape as ch_image_item(), or null if none is set.
+ */
+function ch_get_curated_kit_image() {
+	static $ids_by_url = array();
+
+	$id  = absint( ch_get_setting( 'curated_kit_image_id', 0 ) );
+	$url = trim( (string) ch_get_setting( 'curated_kit_image_url', ch_default_kit_image_url() ) );
+	$alt = trim( (string) ch_get_setting( 'curated_kit_image_alt', '' ) );
+
+	if ( ! $id && '' !== $url ) {
+		if ( ! isset( $ids_by_url[ $url ] ) ) {
+			$ids_by_url[ $url ] = absint( attachment_url_to_postid( $url ) );
+		}
+		$id = $ids_by_url[ $url ];
+	}
+
+	$item = $id ? ch_image_item( $id, $alt ) : null;
+
+	// A URL that isn't in this site's media library still works as a plain image.
+	if ( ! $item && '' !== $url ) {
+		$item = array(
+			'src'    => $url,
+			'width'  => 0,
+			'height' => 0,
+			'srcset' => '',
+			'thumb'  => $url,
+			'alt'    => $alt,
+		);
+	}
+
+	/**
+	 * Filter the curated-kit image.
+	 *
+	 * @param array|null $item Image description, or null for none.
+	 */
+	return apply_filters( 'ch_curated_kit_image', $item );
+}
+
+/**
  * Every product linked to a class in the editor, whether or not it is
  * currently a Studio Session. Use ch_get_class_product_ids() for access.
  *

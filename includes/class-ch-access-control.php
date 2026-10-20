@@ -4,7 +4,7 @@
  *
  * Entitled visitors get the normal (Elementor / theme) single view.
  * Everyone else is sent to the configured Access page, or — if none is set —
- * shown the teaser template (Elementor is bypassed entirely for them).
+ * shown the teaser template (the class's own Elementor content is bypassed).
  * Customers are never redirected to wp-login.php.
  *
  * @package CreativeHub
@@ -19,6 +19,27 @@ class CH_Access_Control {
 
 	public static function init() {
 		add_action( 'template_redirect', array( __CLASS__, 'guard' ) );
+
+		// The teaser is loaded through the normal template step, never printed from
+		// inside template_redirect: Elementor (and so its header/footer, mini-cart
+		// and elementorFrontendConfig) only finishes initialising after our
+		// template_redirect callback has run.
+		add_filter( 'template_include', array( __CLASS__, 'teaser_template' ), 99999 );
+	}
+
+	/**
+	 * Swap in the teaser template when the guard decided this visitor is locked out.
+	 *
+	 * @param string $template Template WordPress resolved.
+	 * @return string
+	 */
+	public static function teaser_template( $template ) {
+		if ( ! self::$showing_teaser ) {
+			return $template;
+		}
+
+		$override = locate_template( array( 'creative-hub/teaser.php' ) );
+		return $override ? $override : CH_PATH . 'templates/teaser.php';
 	}
 
 	public static function guard() {
@@ -65,13 +86,6 @@ class CH_Access_Control {
 
 		status_header( 200 );
 		nocache_headers();
-
-		$template = locate_template( array( 'creative-hub/teaser.php' ) );
-		if ( ! $template ) {
-			$template = CH_PATH . 'templates/teaser.php';
-		}
-		include $template;
-		exit;
 	}
 
 	/**

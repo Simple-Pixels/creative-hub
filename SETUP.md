@@ -7,7 +7,8 @@ What this build covers (phase 1):
 - **Gating**: a class page shows its full content only to customers who bought a linked product. Everyone else is sent to your **Access page** (or, if you don't set one, sees a built-in teaser).
 - A **Creative Hub** area on the *My Account* **Dashboard** tab (`/my-account/`) where customers see their classes, retreat bookings and downloads without digging through emails. Also available as `[creative_hub]` for a standalone page.
 - The **order confirmation screen** names the class(es) just bought and links straight to them and to the hub. No setup — it appears whenever an order contains a class-linked product. If the order contains a **Curated Kit**, it also shows the curated-kit image.
-- An **image gallery** shortcode, `[ch_gallery]`, with thumbnails on the right. Curated Kits products get the curated-kit image added to the end (choose the file under **Classes → Settings → Curated kits**).
+- An **image gallery** shortcode, `[ch_gallery]`: a square main image, thumbnails underneath, and a click-to-zoom lightbox. Curated Kits products get the curated-kit image added to the end (choose the file under **Classes → Settings → Curated kits**).
+- A **downloadable freebies** shortcode, `[ch_freebies]`, that asks visitors to sign up or log in (in a popup) before they can download. See §12.
 - **Retreat bookings** on the hub dashboard, with payment status, balance and a "Pay balance" link when you use *Deposits & Partial Payments for WooCommerce Pro*.
 
 Past-retreat content and teacher fees are **not** in this build.
@@ -211,6 +212,33 @@ Access is tied to a **customer account**, because a guest order has no user to a
 - If someone still checks out as a guest, the order confirmation screen tells them to **create an account with the same email address**. When they do, WooCommerce automatically links that past order, and their class unlocks.
 - A logged-out visitor opening a class they own is shown the Access page (or teaser) with a **"Log into your account"** link — never the raw `wp-login.php` screen.
 
+## 12. Freebies (sign up to download)
+
+Put `[ch_freebies]` on any page (an Elementor Shortcode widget is fine). It lists every **published `freebie`** that has a **featured image**: the image as a preview, with a Download button underneath. The featured image's original file is what gets downloaded.
+
+Options: `[ch_freebies columns="4" count="12" orderby="date" order="DESC" ids="12,15,18"]`. Columns drop to 3 on tablets, 2 on larger phones and 1 on small phones. Style it with CSS variables on `.ch-freebies` (e.g. `--ch-fb-gap`).
+
+**What a visitor sees**
+
+- **Logged in:** Download starts straight away.
+- **Logged out:** a popup with two tabs, *Create account* (email + password) and *Log in*. As soon as they're in, the download starts and the popup says so, with a "download it here" link in case a browser blocks it. After that, every other Download button on the page works without the popup.
+- Creating an account makes a normal WooCommerce **customer** (so WooCommerce's "new account" email goes out and they can see the account in *My Account* and the Creative Hub). If the email already has an account, the popup moves them to the Log in tab with the email filled in.
+- With JavaScript off, the Download link sends logged-out visitors to *My Account* to log in, then straight back to the download.
+
+**Settings: Classes → Settings → Freebies**
+
+| Setting | Notes |
+|---|---|
+| Popup heading / message | The wording at the top of the popup. |
+| Email the freebie | Off by default. When on, each download also emails the freebie (attached, in your WooCommerce email style) to the customer. Files over 8MB aren't attached, and each person gets at most one email per freebie per hour. |
+
+**Things to know**
+
+- **The `freebie` post type must exist on the site.** The shortcode reads post type `freebie` (change it with the `ch_freebie_post_type` filter). If it isn't registered, editors see a short message where the grid would be; visitors see nothing.
+- **Protecting the file.** The Download button points at `/?ch_freebie=ID`, which checks that the visitor is logged in before sending the file, and the original file's URL is never written into the page. The preview is the "medium_large" (768px) size (change with `ch_freebie_preview_size`). Two limits: if an image is no bigger than that, the preview *is* the original; and the file itself still sits in the Media Library, so anyone who knows or guesses its direct URL (for example by changing the number in a filename like `…FREEBIES-12.jpeg`) can open it without logging in. To use a different file for a freebie, filter `ch_freebie_attachment_id`.
+- **Spam protection.** Sign-up has a hidden honeypot field and allows 8 attempts per visitor per 15 minutes; log-in locks out after 10 failed tries. The popup fetches a fresh security token each time it opens, so Kinsta's page cache can't serve an expired one.
+- **Newsletter sign-up** isn't included. Accounts are created in WooCommerce only. If the client wants these emails added to Mailchimp, Klaviyo or similar, hook the `ch_freebie_downloaded` action (it passes the user ID and the freebie) or tell me which service.
+
 ## Troubleshooting
 
 - **"It sent me to wp-login.php"** — fixed in 0.3.1. Update the plugin. Locked class pages now use the Access page, or the teaser, and their log-in links go to `/my-account/`.
@@ -230,6 +258,7 @@ Access is tied to a **customer account**, because a guest order has no user to a
 | `[ch_my_classes]` | Grid of the visitor's accessible classes |
 | `[ch_my_retreats]` | The visitor's retreat bookings (collection = `retreats`), with payment status, balance and a Pay balance link |
 | `[ch_my_downloads]` | The visitor's downloadable files, grouped by class |
+| `[ch_freebies]` | Grid of `freebie` posts with a Download button each; logged-out visitors get a sign-up / log-in popup first. Options: `columns`, `count`, `orderby`, `order`, `ids`. |
 | `[ch_gallery]` | Image gallery for the current product or class (`product_id="123"` to target one; `fit="cover"` and `ratio="3/4"` optional; default frame is 1/1 square). Click the main image for a zoomable lightbox. Curated kits get the kit image added at the end. |
 | `[ch_class_products]` | Buy options for the current class (`class_id="123"` to target another) |
 | `[ch_access_notice]` | "You don't have access" notice for the Access page — buy links + log-in link (reads `?ch_class=123`) |
@@ -253,5 +282,10 @@ Access is tied to a **customer account**, because a guest order has no user to a
 | `ch_curated_kit_term` / `ch_curated_kit_taxonomies` | filter | Which term makes a product a curated kit (default `curated-kits`, in `collection`) |
 | `ch_curated_kit_image` | filter | The curated-kit image description |
 | `ch_gallery_items` | filter | The images `[ch_gallery]` is about to show |
+| `ch_freebie_post_type` | filter | The post type `[ch_freebies]` lists (default `freebie`) |
+| `ch_freebie_preview_size` | filter | Image size shown as the preview (default `medium_large`) |
+| `ch_freebie_attachment_id` | filter | The attachment a freebie downloads (default: its featured image) |
+| `ch_freebie_email_max_bytes` | filter | Largest file attached to the freebie email (default 8MB) |
+| `ch_freebie_downloaded` | action | After a freebie is sent: user ID, freebie post ID, attachment ID |
 | `ch_no_access_redirect` | filter | The Access-page URL a no-access visitor is redirected to |
 | `ch_locked_logged_out_redirect` | filter | Where a logged-out visitor is sent when no Access page is set |

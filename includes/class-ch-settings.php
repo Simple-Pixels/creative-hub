@@ -63,6 +63,7 @@ class CH_Settings {
 		return array(
 			'general'      => __( 'General', 'creative-hub' ),
 			'curated-kits' => __( 'Curated kits', 'creative-hub' ),
+			'freebies'     => __( 'Freebies', 'creative-hub' ),
 		);
 	}
 
@@ -96,6 +97,14 @@ class CH_Settings {
 			$out['curated_kit_image_id']  = $id;
 			$out['curated_kit_image_url'] = $url;
 			$out['curated_kit_image_alt'] = sanitize_text_field( $input['curated_kit_image_alt'] ?? '' );
+
+			return $out;
+		}
+
+		if ( 'freebies' === $tab ) {
+			$out['freebie_email']   = empty( $input['freebie_email'] ) ? 0 : 1;
+			$out['freebie_heading'] = sanitize_text_field( $input['freebie_heading'] ?? '' );
+			$out['freebie_intro']   = sanitize_textarea_field( $input['freebie_intro'] ?? '' );
 
 			return $out;
 		}
@@ -150,11 +159,58 @@ class CH_Settings {
 			<?php
 			if ( 'curated-kits' === $tab ) {
 				self::render_curated_kits();
+			} elseif ( 'freebies' === $tab ) {
+				self::render_freebies();
 			} else {
 				self::render_general();
 			}
 			?>
 		</div>
+		<?php
+	}
+
+	protected static function render_freebies() {
+		$email   = (int) ch_get_setting( 'freebie_email', 0 );
+		$heading = CH_Freebies::heading();
+		$intro   = CH_Freebies::intro();
+		?>
+		<form method="post" action="options.php">
+			<?php settings_fields( 'ch_settings_group' ); ?>
+			<input type="hidden" name="<?php echo esc_attr( self::OPTION ); ?>[_tab]" value="freebies">
+
+			<p>
+				<?php esc_html_e( 'The [ch_freebies] shortcode lists your freebies. Visitors who aren\'t logged in see a sign-up / log-in popup before the download starts.', 'creative-hub' ); ?>
+				<?php
+				printf(
+					/* translators: %s: post type slug */
+					esc_html__( 'It reads the "%s" post type and downloads each freebie\'s featured image.', 'creative-hub' ),
+					esc_html( CH_Freebies::post_type() )
+				);
+				?>
+			</p>
+
+			<table class="form-table" role="presentation">
+				<tr>
+					<th scope="row"><label for="ch-fb-heading"><?php esc_html_e( 'Popup heading', 'creative-hub' ); ?></label></th>
+					<td><input type="text" class="large-text" id="ch-fb-heading" name="<?php echo esc_attr( self::OPTION ); ?>[freebie_heading]" value="<?php echo esc_attr( $heading ); ?>"></td>
+				</tr>
+				<tr>
+					<th scope="row"><label for="ch-fb-intro"><?php esc_html_e( 'Popup message', 'creative-hub' ); ?></label></th>
+					<td><textarea class="large-text" rows="3" id="ch-fb-intro" name="<?php echo esc_attr( self::OPTION ); ?>[freebie_intro]"><?php echo esc_textarea( $intro ); ?></textarea></td>
+				</tr>
+				<tr>
+					<th scope="row"><?php esc_html_e( 'Email the freebie', 'creative-hub' ); ?></th>
+					<td>
+						<label>
+							<input type="checkbox" name="<?php echo esc_attr( self::OPTION ); ?>[freebie_email]" value="1" <?php checked( $email, 1 ); ?>>
+							<?php esc_html_e( 'Also email each freebie to the customer when they download it', 'creative-hub' ); ?>
+						</label>
+						<p class="description"><?php esc_html_e( 'Sent in your WooCommerce email style with the file attached (files over 8MB are not attached). Each person gets at most one email per freebie per hour. Off by default.', 'creative-hub' ); ?></p>
+					</td>
+				</tr>
+			</table>
+			<?php submit_button(); ?>
+		</form>
 		<?php
 	}
 
@@ -318,6 +374,7 @@ class CH_Settings {
 		<p><code>[ch_my_classes]</code> — <?php esc_html_e( 'just the grid of the visitor\'s classes.', 'creative-hub' ); ?></p>
 		<p><code>[ch_my_retreats]</code> — <?php esc_html_e( 'just the visitor\'s retreat bookings, with payment status.', 'creative-hub' ); ?></p>
 		<p><code>[ch_my_downloads]</code> — <?php esc_html_e( 'just the download list, grouped by class.', 'creative-hub' ); ?></p>
+		<p><code>[ch_freebies]</code> — <?php esc_html_e( 'the freebies grid; logged-out visitors get a sign-up / log-in popup before downloading.', 'creative-hub' ); ?></p>
 		<p><code>[ch_gallery]</code> — <?php esc_html_e( 'image gallery for the current product or class (add product_id="123" to target one). Curated kits get the kit image added at the end.', 'creative-hub' ); ?></p>
 		<p><code>[ch_class_products]</code> — <?php esc_html_e( 'buy options for the current class (use on the teaser).', 'creative-hub' ); ?></p>
 		<p><code>[ch_access_notice]</code> — <?php esc_html_e( 'the "you don\'t have access" notice for the Access page (buy links + log-in link).', 'creative-hub' ); ?></p>

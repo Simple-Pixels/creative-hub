@@ -5,7 +5,7 @@ Tested up to: 6.6
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 9.3
-Stable tag: 0.6.2
+Stable tag: 0.7.0
 License: GPLv2 or later
 
 Post-purchase members area for online classes, built on WooCommerce.
@@ -32,6 +32,19 @@ See SETUP.md in the plugin folder.
 4. Configure under Classes > Settings.
 
 == Changelog ==
+
+= 0.7.0 =
+* New: `[ch_freebies]` lists every published `freebie` with a featured image and a
+  Download button. Visitors who aren't logged in get a sign-up / log-in popup first;
+  the download starts as soon as they're in. Sign-up creates a WooCommerce customer
+  account (so they can see it in My Account and the Creative Hub).
+* The file is served through a login check (`/?ch_freebie=ID`), so the original
+  file's URL is never printed into the page.
+* New Classes → Settings → "Freebies" tab: popup heading and message, and an option
+  to also email the freebie (attached, in WooCommerce email style) when it's
+  downloaded. Off by default.
+* Sign-up and log-in are protected with a fresh per-visit nonce, a honeypot field and
+  per-IP rate limiting.
 
 = 0.6.2 =
 * `[ch_gallery]`: default frame is now square (1:1). `ratio="3/4"` still gives portrait.

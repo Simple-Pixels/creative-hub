@@ -191,14 +191,19 @@ class CH_Retreats {
 			$balance_due = 'partially-paid' === $status;
 		}
 
+		$decimals = function_exists( 'wc_get_price_decimals' ) ? (int) wc_get_price_decimals() : 2;
+		$total    = (float) $order->get_total();
+
 		$paid = null;
-		if ( $balance_due && $has_deposit && $deposit_amt > 0 && $deposit_ok ) {
+		if ( $balance_due && $any && $total > $owed ) {
+			// The instalments exist as payment orders, so everything that isn't still owed has been
+			// paid: the deposit plus any instalments already made.
+			$paid = round( $total - $owed, $decimals );
+		} elseif ( $balance_due && $has_deposit && $deposit_amt > 0 && $deposit_ok ) {
+			// No instalment orders to read: all we know is the deposit went in.
 			$paid = $deposit_amt;
-		} elseif ( $balance_due && null !== $balance ) {
-			$total = (float) $order->get_total();
-			if ( $total > $balance ) {
-				$paid = $total - $balance;
-			}
+		} elseif ( $balance_due && null !== $balance && $total > $balance ) {
+			$paid = round( $total - $balance, $decimals );
 		}
 
 		if ( $balance_due ) {

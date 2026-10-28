@@ -5,7 +5,7 @@ Tested up to: 6.6
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 9.3
-Stable tag: 0.8.2
+Stable tag: 0.8.3
 License: GPLv2 or later
 
 Post-purchase members area for online classes, built on WooCommerce.
@@ -32,6 +32,11 @@ See SETUP.md in the plugin folder.
 4. Configure under Classes > Settings.
 
 == Changelog ==
+
+= 0.8.3 =
+* Fixed: a retreat booking's "Paid so far" showed only the deposit, ignoring instalments
+  already paid (e.g. $0.20 instead of $0.60 after the deposit and a $0.40 instalment).
+  It is now the order total minus what is still owed across the unpaid instalments.
 
 = 0.8.2 =
 * Creative Hub class cards redesigned: the pink block is now the class's featured image

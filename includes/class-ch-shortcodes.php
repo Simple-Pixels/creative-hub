@@ -118,7 +118,13 @@ class CH_Shortcodes {
 					</a>
 					<div class="ch-card__body">
 						<h4 class="ch-card__title"><a href="<?php the_permalink(); ?>"><?php the_title(); ?></a></h4>
-						<a class="ch-btn ch-card__cta" href="<?php the_permalink(); ?>"><?php esc_html_e( 'Open class', 'creative-hub' ); ?></a>
+						<div class="ch-card__actions">
+							<a class="ch-btn ch-card__cta" href="<?php the_permalink(); ?>"><?php esc_html_e( 'Open class', 'creative-hub' ); ?></a>
+							<?php
+							// A Download button (and popup) when the class has files; nothing otherwise.
+							echo CH_Class_Files::button( get_the_ID(), array( 'class' => 'ch-card__cta' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside button().
+							?>
+						</div>
 					</div>
 				</article>
 				<?php

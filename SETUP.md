@@ -252,6 +252,8 @@ Options: `[ch_class_files label="Get the files"]`. Use `class_id="123"` to point
 - The name shown is the file's title in the Media Library; change it there if it reads badly.
 - The field names are filterable (`ch_class_files_repeater`, `ch_class_files_subfield`) if they ever change. If ACF is deactivated the files still work, because the plugin falls back to the data ACF saves.
 
+**In the Creative Hub.** No setup: each class card in *My classes* (My Account → Dashboard) gets a **Download** button beside "Open class" whenever the class has files, opening the same popup, so customers can grab their files without opening the class first. Classes with no files show no button.
+
 **Who sees it**
 
 - The button only appears for people who can open the class (buyers, and staff with Staff preview on). On any other page, or for anyone else, it prints nothing.

@@ -5,9 +5,9 @@
 	display: block;
 }
 
-.ch-cf button.ch-btn.ch-cf__open,
-.ch-cf button.ch-btn.ch-cf__open:hover,
-.ch-cf button.ch-btn.ch-cf__open:focus {
+button.ch-btn.ch-cf__open,
+button.ch-btn.ch-cf__open:hover,
+button.ch-btn.ch-cf__open:focus {
 	display: inline-flex !important;
 	align-items: center;
 	justify-content: center;
@@ -29,17 +29,27 @@
 	cursor: pointer;
 }
 
-.ch-cf button.ch-btn.ch-cf__open:hover {
+button.ch-btn.ch-cf__open:hover {
 	transform: scale(0.96);
 }
 
-.ch-cf button.ch-btn.ch-cf__open:focus-visible {
+button.ch-btn.ch-cf__open:focus-visible {
 	outline: 3px solid #000 !important;
 	outline-offset: 2px;
 }
 
 .ch-cf__open svg {
 	flex: none;
+}
+
+/* On a class card in the Creative Hub: same size and case as the "Open class" button beside it */
+.ch-card button.ch-btn.ch-cf__open,
+.ch-card button.ch-btn.ch-cf__open:hover,
+.ch-card button.ch-btn.ch-cf__open:focus {
+	margin: 0 !important;
+	padding: 12px !important;
+	font-size: 16px !important;
+	text-transform: uppercase !important;
 }
 
 /* ---------- Popup ---------- */
@@ -286,7 +296,7 @@ html.ch-cfm-open body {
 		transition: none !important;
 	}
 
-	.ch-cf button.ch-btn.ch-cf__open:hover {
+	button.ch-btn.ch-cf__open:hover {
 		transform: none;
 	}
 }

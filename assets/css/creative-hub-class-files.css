@@ -1,0 +1,292 @@
+/* Creative Hub — class files button and popup ([ch_class_files]) */
+
+/* ---------- Trigger button ---------- */
+.ch-cf {
+	display: block;
+}
+
+.ch-cf button.ch-btn.ch-cf__open,
+.ch-cf button.ch-btn.ch-cf__open:hover,
+.ch-cf button.ch-btn.ch-cf__open:focus {
+	display: inline-flex !important;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-height: 0 !important;
+	margin: 0 !important;
+	padding: 14px 28px !important;
+	border: 0 !important;
+	border-radius: 4px !important;
+	background: #f47c77 !important;
+	box-shadow: none !important;
+	color: #fff !important;
+	font-family: "Manrope", sans-serif;
+	font-size: 18px !important;
+	font-weight: 400 !important;
+	line-height: 1.2 !important;
+	text-transform: none !important;
+	letter-spacing: normal !important;
+	cursor: pointer;
+}
+
+.ch-cf button.ch-btn.ch-cf__open:hover {
+	transform: scale(0.96);
+}
+
+.ch-cf button.ch-btn.ch-cf__open:focus-visible {
+	outline: 3px solid #000 !important;
+	outline-offset: 2px;
+}
+
+.ch-cf__open svg {
+	flex: none;
+}
+
+/* ---------- Popup ---------- */
+html.ch-cfm-open,
+html.ch-cfm-open body {
+	overflow: hidden;
+}
+
+.ch-cfm {
+	position: fixed;
+	inset: 0;
+	z-index: 999999;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	padding: 16px;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.25s ease, visibility 0s linear 0.25s;
+}
+
+.ch-cfm.is-open {
+	opacity: 1;
+	visibility: visible;
+	transition: opacity 0.25s ease, visibility 0s;
+}
+
+.ch-cfm__backdrop {
+	position: absolute;
+	inset: 0;
+	background: rgba(0, 0, 0, 0.6);
+}
+
+.ch-cfm__panel {
+	position: relative;
+	box-sizing: border-box;
+	width: 100%;
+	max-width: 560px;
+	max-height: calc(100vh - 32px);
+	max-height: calc(100dvh - 32px);
+	overflow-y: auto;
+	padding: 32px 28px 28px;
+	border-radius: 16px;
+	background: #fff;
+	color: #000;
+	box-shadow: 0 24px 60px rgba(0, 0, 0, 0.3);
+	transform: translateY(12px);
+	transition: transform 0.25s ease;
+}
+
+.ch-cfm.is-open .ch-cfm__panel {
+	transform: none;
+}
+
+/* Hard reset against theme / Elementor button styles */
+.ch-cfm button.ch-cfm__close,
+.ch-cfm button.ch-cfm__close:hover,
+.ch-cfm button.ch-cfm__close:focus {
+	position: absolute;
+	top: 12px;
+	right: 12px;
+	display: flex !important;
+	align-items: center;
+	justify-content: center;
+	width: 40px;
+	height: 40px;
+	margin: 0 !important;
+	padding: 0 !important;
+	border: 0 !important;
+	border-radius: 50% !important;
+	background: transparent !important;
+	box-shadow: none !important;
+	color: #000 !important;
+	line-height: 0 !important;
+	min-height: 0 !important;
+	cursor: pointer;
+	transition: background-color 0.2s ease;
+}
+
+.ch-cfm button.ch-cfm__close:hover {
+	background: #f4bebc !important;
+}
+
+.ch-cfm button.ch-cfm__close:focus-visible {
+	outline: 3px solid #000 !important;
+	outline-offset: 2px;
+}
+
+.ch-cfm .ch-cfm__title {
+	margin: 0 44px 4px 0;
+	font-size: 26px;
+	line-height: 1.2;
+}
+
+.ch-cfm .ch-cfm__sub {
+	margin: 0 0 20px;
+	color: #6b6b6b;
+	font-size: 15px;
+	line-height: 1.4;
+}
+
+/* Download all */
+.ch-cfm .ch-cfm__all,
+.ch-cfm a.ch-btn.ch-cfm__all:hover,
+.ch-cfm a.ch-btn.ch-cfm__all:focus {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	box-sizing: border-box;
+	width: 100%;
+	margin: 0 0 20px;
+	padding: 14px 20px !important;
+	border: 0 !important;
+	border-radius: 4px !important;
+	background: #f47c77 !important;
+	color: #fff !important;
+	font-size: 18px !important;
+	font-weight: 400 !important;
+	line-height: 1.2 !important;
+	text-align: center;
+	text-decoration: none;
+}
+
+.ch-cfm a.ch-btn.ch-cfm__all.is-busy {
+	opacity: 0.75;
+	cursor: progress;
+}
+
+.ch-cfm a.ch-btn.ch-cfm__all:focus-visible,
+.ch-cfm a.ch-btn.ch-cfm__dl:focus-visible {
+	outline: 3px solid #000 !important;
+	outline-offset: 2px;
+}
+
+/* File list */
+.ch-cfm .ch-cfm__list {
+	margin: 0;
+	padding: 0;
+	list-style: none;
+}
+
+.ch-cfm .ch-cfm__item {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr) auto;
+	align-items: center;
+	gap: 14px;
+	margin: 0;
+	padding: 14px 0;
+	border-top: 1px solid #eadedd;
+}
+
+.ch-cfm .ch-cfm__item:first-child {
+	border-top: 0;
+	padding-top: 4px;
+}
+
+.ch-cfm__ext {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 48px;
+	height: 48px;
+	border-radius: 10px;
+	background: #f4bebc;
+	color: #000;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.03em;
+}
+
+.ch-cfm__meta {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+	min-width: 0;
+}
+
+.ch-cfm__name {
+	font-size: 16px;
+	font-weight: 600;
+	line-height: 1.3;
+	overflow-wrap: anywhere;
+}
+
+.ch-cfm__size {
+	color: #6b6b6b;
+	font-size: 13px;
+}
+
+.ch-cfm a.ch-btn.ch-cfm__dl,
+.ch-cfm a.ch-btn.ch-cfm__dl:hover,
+.ch-cfm a.ch-btn.ch-cfm__dl:focus {
+	display: inline-block;
+	box-sizing: border-box;
+	margin: 0;
+	padding: 10px 18px !important;
+	border: 0 !important;
+	border-radius: 4px !important;
+	background: #f47c77 !important;
+	color: #fff !important;
+	font-size: 16px !important;
+	font-weight: 400 !important;
+	line-height: 1.2 !important;
+	text-align: center;
+	text-decoration: none;
+}
+
+@media (max-width: 480px) {
+	.ch-cfm {
+		align-items: flex-end;
+		padding: 0;
+	}
+
+	.ch-cfm__panel {
+		max-width: none;
+		max-height: 92vh;
+		max-height: 92dvh;
+		padding: 28px 20px 24px;
+		border-radius: 16px 16px 0 0;
+	}
+
+	.ch-cfm .ch-cfm__title {
+		font-size: 22px;
+	}
+
+	/* Button drops under the name so long file names stay readable */
+	.ch-cfm .ch-cfm__item {
+		grid-template-columns: auto minmax(0, 1fr);
+		row-gap: 10px;
+	}
+
+	.ch-cfm a.ch-btn.ch-cfm__dl {
+		grid-column: 1 / -1;
+		display: block;
+		width: 100%;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.ch-cfm,
+	.ch-cfm__panel,
+	.ch-cfm * {
+		transition: none !important;
+	}
+
+	.ch-cf button.ch-btn.ch-cf__open:hover {
+		transform: none;
+	}
+}

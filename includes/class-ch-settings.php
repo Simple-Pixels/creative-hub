@@ -374,6 +374,7 @@ class CH_Settings {
 		<p><code>[ch_my_classes]</code> — <?php esc_html_e( 'just the grid of the visitor\'s classes.', 'creative-hub' ); ?></p>
 		<p><code>[ch_my_retreats]</code> — <?php esc_html_e( 'just the visitor\'s retreat bookings, with payment status.', 'creative-hub' ); ?></p>
 		<p><code>[ch_my_downloads]</code> — <?php esc_html_e( 'just the download list, grouped by class.', 'creative-hub' ); ?></p>
+		<p><code>[ch_class_files]</code> — <?php esc_html_e( 'a Download button for a Class page; opens a popup listing the class\'s files, with a Download all (zip).', 'creative-hub' ); ?></p>
 		<p><code>[ch_freebies]</code> — <?php esc_html_e( 'the freebies grid; logged-out visitors get a sign-up / log-in popup before downloading.', 'creative-hub' ); ?></p>
 		<p><code>[ch_gallery]</code> — <?php esc_html_e( 'image gallery for the current product or class (add product_id="123" to target one). Curated kits get the kit image added at the end.', 'creative-hub' ); ?></p>
 		<p><code>[ch_class_products]</code> — <?php esc_html_e( 'buy options for the current class (use on the teaser).', 'creative-hub' ); ?></p>

@@ -5,7 +5,7 @@ Tested up to: 6.6
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 9.3
-Stable tag: 0.7.0
+Stable tag: 0.8.0
 License: GPLv2 or later
 
 Post-purchase members area for online classes, built on WooCommerce.
@@ -32,6 +32,17 @@ See SETUP.md in the plugin folder.
 4. Configure under Classes > Settings.
 
 == Changelog ==
+
+= 0.8.0 =
+* New: `[ch_class_files]` puts a Download button on a Class page. It opens a popup
+  listing every file for that class (the `downloadable_files` repeater / `class_file`
+  field on the linked Studio Session product), each with its own Download button, plus
+  "Download all" as a zip.
+* Files are served through an access check (`/?ch_class_file=…`, `/?ch_class_zip=…`):
+  only people who can open the class can download, only that class's files can be
+  requested, and the files' real URLs are never printed into the page.
+* Works whether or not ACF is active (falls back to the post meta ACF writes), and
+  for files that live on a CDN / bucket rather than on the server.
 
 = 0.7.0 =
 * New: `[ch_freebies]` lists every published `freebie` with a featured image and a

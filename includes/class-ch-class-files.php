@@ -301,6 +301,40 @@ class CH_Class_Files {
 				: '';
 		}
 
+		return '<div class="ch-scope ch-cf">' . self::button( $class_id, array( 'label' => $atts['label'] ), $files ) . '</div>';
+	}
+
+	/**
+	 * The Download button on its own, for use inside other markup (e.g. the class cards
+	 * in the Creative Hub). Registers the popup for the footer and loads the assets.
+	 * Prints nothing if the visitor can't open the class or it has no files.
+	 *
+	 * @param int          $class_id Class post ID.
+	 * @param array        $args     Optional: label, class (extra CSS classes).
+	 * @param array[]|null $files    Files already looked up by the caller, to save a second lookup.
+	 * @return string Button markup, or '' when there is nothing to download.
+	 */
+	public static function button( $class_id, $args = array(), $files = null ) {
+		$class_id = absint( $class_id );
+		$args     = wp_parse_args(
+			$args,
+			array(
+				'label' => __( 'Download', 'creative-hub' ),
+				'class' => '',
+			)
+		);
+
+		if ( ! $class_id || 'ch_class' !== get_post_type( $class_id ) || ! ch_user_can_access_class( $class_id ) ) {
+			return '';
+		}
+
+		if ( null === $files ) {
+			$files = self::get_files( $class_id );
+		}
+		if ( ! $files ) {
+			return '';
+		}
+
 		self::enqueue();
 
 		if ( ! isset( self::$modals[ $class_id ] ) ) {
@@ -309,15 +343,14 @@ class CH_Class_Files {
 		}
 
 		$modal_id = 'ch-cfm-' . $class_id;
+		$classes  = trim( 'ch-btn ch-cf__open ' . $args['class'] );
 
 		ob_start();
 		?>
-		<div class="ch-scope ch-cf">
-			<button type="button" class="ch-btn ch-cf__open" data-ch-cfm-open="<?php echo esc_attr( $modal_id ); ?>" aria-haspopup="dialog" aria-controls="<?php echo esc_attr( $modal_id ); ?>">
-				<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 19h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
-				<span><?php echo esc_html( $atts['label'] ); ?></span>
-			</button>
-		</div>
+		<button type="button" class="<?php echo esc_attr( $classes ); ?>" data-ch-cfm-open="<?php echo esc_attr( $modal_id ); ?>" aria-haspopup="dialog" aria-controls="<?php echo esc_attr( $modal_id ); ?>">
+			<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 19h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+			<span><?php echo esc_html( $args['label'] ); ?></span>
+		</button>
 		<?php
 		return ob_get_clean();
 	}

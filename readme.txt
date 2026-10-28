@@ -5,7 +5,7 @@ Tested up to: 6.6
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 9.3
-Stable tag: 0.8.0
+Stable tag: 0.8.1
 License: GPLv2 or later
 
 Post-purchase members area for online classes, built on WooCommerce.
@@ -32,6 +32,11 @@ See SETUP.md in the plugin folder.
 4. Configure under Classes > Settings.
 
 == Changelog ==
+
+= 0.8.1 =
+* The class cards in the Creative Hub (My Account → Dashboard) now have a Download
+  button beside "Open class" whenever the class has files. It opens the same popup of
+  files (with Download all) as `[ch_class_files]`. Classes without files show no button.
 
 = 0.8.0 =
 * New: `[ch_class_files]` puts a Download button on a Class page. It opens a popup

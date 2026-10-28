@@ -9,6 +9,7 @@ What this build covers (phase 1):
 - The **order confirmation screen** names the class(es) just bought and links straight to them and to the hub. No setup — it appears whenever an order contains a class-linked product. If the order contains a **Curated Kit**, it also shows the curated-kit image.
 - An **image gallery** shortcode, `[ch_gallery]`: a square main image, thumbnails underneath, and a click-to-zoom lightbox. Curated Kits products get the curated-kit image added to the end (choose the file under **Classes → Settings → Curated kits**).
 - A **downloadable freebies** shortcode, `[ch_freebies]`, that asks visitors to sign up or log in (in a popup) before they can download. See §12.
+- A **class files** shortcode, `[ch_class_files]`: a Download button for Class pages that opens a popup of that class's files, with Download all. See §13.
 - **Retreat bookings** on the hub dashboard, with payment status, balance and a "Pay balance" link when you use *Deposits & Partial Payments for WooCommerce Pro*.
 
 Past-retreat content and teacher fees are **not** in this build.
@@ -239,6 +240,30 @@ Options: `[ch_freebies columns="4" count="12" orderby="date" order="DESC" ids="1
 - **Spam protection.** Sign-up has a hidden honeypot field and allows 8 attempts per visitor per 15 minutes; log-in locks out after 10 failed tries. The popup fetches a fresh security token each time it opens, so Kinsta's page cache can't serve an expired one.
 - **Newsletter sign-up** isn't included. Accounts are created in WooCommerce only. If the client wants these emails added to Mailchimp, Klaviyo or similar, hook the `ch_freebie_downloaded` action (it passes the user ID and the freebie) or tell me which service.
 
+## 13. Class files (Download button + popup)
+
+Put `[ch_class_files]` on the Class page, ideally in your Elementor **single template for Classes** using a Shortcode widget, so every class gets it. It shows a **Download** button. Clicking it opens a popup that lists every file for that class: a name, file type and size for each, a **Download** button per file, and a **Download all** button that sends them as one zip.
+
+Options: `[ch_class_files label="Get the files"]`. Use `class_id="123"` to point it at a different class.
+
+**Where the files come from**
+
+- The class's linked **Studio Session** product(s) (see §5). On the product, the ACF repeater **`downloadable_files`**, with a file sub field **`class_file`**. If a class is linked to more than one product, their files are combined (a file on both appears once).
+- The name shown is the file's title in the Media Library; change it there if it reads badly.
+- The field names are filterable (`ch_class_files_repeater`, `ch_class_files_subfield`) if they ever change. If ACF is deactivated the files still work, because the plugin falls back to the data ACF saves.
+
+**Who sees it**
+
+- The button only appears for people who can open the class (buyers, and staff with Staff preview on). On any other page, or for anyone else, it prints nothing.
+- Editors who see nothing get a short hint in its place when the product has no files, or the shortcode isn't on a Class page.
+- Each download goes through `/?ch_class_file=…` (or `/?ch_class_zip=…`), which re-checks access every time and only serves files that belong to that class. The real file addresses are never written into the page. As with the freebies, the files still sit in the Media Library: anyone who already knows a direct file URL can open it.
+
+**Notes**
+
+- "Download all" needs the PHP **zip** extension (almost every host has it); if it's missing the button is simply left out and the per-file buttons still work. Each zip is built on the fly, so a very large set of files may take a few seconds (the button says "Preparing your zip…").
+- If the files are stored on a CDN / bucket (for example with WP Offload Media) and not on the server, single downloads hand over to that file's own address after the access check, and Download all fetches a temporary copy of each.
+- To do something after a download (log it, tag the customer), use the `ch_class_file_downloaded` and `ch_class_zip_downloaded` actions.
+
 ## Troubleshooting
 
 - **"It sent me to wp-login.php"** — fixed in 0.3.1. Update the plugin. Locked class pages now use the Access page, or the teaser, and their log-in links go to `/my-account/`.
@@ -258,6 +283,7 @@ Options: `[ch_freebies columns="4" count="12" orderby="date" order="DESC" ids="1
 | `[ch_my_classes]` | Grid of the visitor's accessible classes |
 | `[ch_my_retreats]` | The visitor's retreat bookings (collection = `retreats`), with payment status, balance and a Pay balance link |
 | `[ch_my_downloads]` | The visitor's downloadable files, grouped by class |
+| `[ch_class_files]` | A Download button for a Class page; opens a popup listing the class's files (from the product's `downloadable_files` ACF repeater) with a Download all zip. Options: `label`, `class_id`. |
 | `[ch_freebies]` | Grid of `freebie` posts with a Download button each; logged-out visitors get a sign-up / log-in popup first. Options: `columns`, `count`, `orderby`, `order`, `ids`. |
 | `[ch_gallery]` | Image gallery for the current product or class (`product_id="123"` to target one; `fit="cover"` and `ratio="3/4"` optional; default frame is 1/1 square). Click the main image for a zoomable lightbox. Curated kits get the kit image added at the end. |
 | `[ch_class_products]` | Buy options for the current class (`class_id="123"` to target another) |
@@ -282,6 +308,9 @@ Options: `[ch_freebies columns="4" count="12" orderby="date" order="DESC" ids="1
 | `ch_curated_kit_term` / `ch_curated_kit_taxonomies` | filter | Which term makes a product a curated kit (default `curated-kits`, in `collection`) |
 | `ch_curated_kit_image` | filter | The curated-kit image description |
 | `ch_gallery_items` | filter | The images `[ch_gallery]` is about to show |
+| `ch_class_files_repeater` / `ch_class_files_subfield` | filter | ACF repeater and file field names holding a product's class files (default `downloadable_files` / `class_file`) |
+| `ch_class_files` | filter | The list of files offered for a class |
+| `ch_class_file_downloaded` / `ch_class_zip_downloaded` | action | After a class file / the zip is sent (user ID, class ID, and for a file the attachment ID) |
 | `ch_freebie_post_type` | filter | The post type `[ch_freebies]` lists (default `freebie`) |
 | `ch_freebie_preview_size` | filter | Image size shown as the preview (default `medium_large`) |
 | `ch_freebie_attachment_id` | filter | The attachment a freebie downloads (default: its featured image) |

@@ -106,7 +106,8 @@ class CH_Shortcodes {
 			echo '<div class="ch-grid">';
 			while ( $query->have_posts() ) {
 				$query->the_post();
-				$thumb = get_the_post_thumbnail( get_the_ID(), 'medium_large' );
+				// The class's own image, or its Studio Session product's if the class has none.
+				$thumb = ch_class_thumbnail( get_the_ID(), 'medium_large' );
 				?>
 				<article class="ch-card">
 					<a class="ch-card__media" href="<?php the_permalink(); ?>">
@@ -122,7 +123,7 @@ class CH_Shortcodes {
 							<a class="ch-btn ch-card__cta" href="<?php the_permalink(); ?>"><?php esc_html_e( 'Open class', 'creative-hub' ); ?></a>
 							<?php
 							// A Download button (and popup) when the class has files; nothing otherwise.
-							echo CH_Class_Files::button( get_the_ID(), array( 'class' => 'ch-card__cta' ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside button().
+							echo CH_Class_Files::button( get_the_ID(), array( 'class' => 'ch-card__cta', 'icon_only' => true ) ); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped inside button().
 							?>
 						</div>
 					</div>

@@ -310,7 +310,8 @@ class CH_Class_Files {
 	 * Prints nothing if the visitor can't open the class or it has no files.
 	 *
 	 * @param int          $class_id Class post ID.
-	 * @param array        $args     Optional: label, class (extra CSS classes).
+	 * @param array        $args     Optional: label, class (extra CSS classes), icon_only (show just
+	 *                               the icon; the label stays as the accessible name and tooltip).
 	 * @param array[]|null $files    Files already looked up by the caller, to save a second lookup.
 	 * @return string Button markup, or '' when there is nothing to download.
 	 */
@@ -319,8 +320,9 @@ class CH_Class_Files {
 		$args     = wp_parse_args(
 			$args,
 			array(
-				'label' => __( 'Download', 'creative-hub' ),
-				'class' => '',
+				'label'     => __( 'Download', 'creative-hub' ),
+				'class'     => '',
+				'icon_only' => false,
 			)
 		);
 
@@ -343,11 +345,12 @@ class CH_Class_Files {
 		}
 
 		$modal_id = 'ch-cfm-' . $class_id;
-		$classes  = trim( 'ch-btn ch-cf__open ' . $args['class'] );
+		$classes  = trim( 'ch-btn ch-cf__open ' . ( $args['icon_only'] ? 'ch-cf__open--icon ' : '' ) . $args['class'] );
+		$title    = $args['icon_only'] ? ' title="' . esc_attr( $args['label'] ) . '"' : '';
 
 		ob_start();
 		?>
-		<button type="button" class="<?php echo esc_attr( $classes ); ?>" data-ch-cfm-open="<?php echo esc_attr( $modal_id ); ?>" aria-haspopup="dialog" aria-controls="<?php echo esc_attr( $modal_id ); ?>">
+		<button type="button" class="<?php echo esc_attr( $classes ); ?>"<?php echo $title; // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- escaped above. ?> data-ch-cfm-open="<?php echo esc_attr( $modal_id ); ?>" aria-haspopup="dialog" aria-controls="<?php echo esc_attr( $modal_id ); ?>">
 			<svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true" focusable="false"><path d="M12 3v12m0 0l-4.5-4.5M12 15l4.5-4.5M4 19h16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
 			<span><?php echo esc_html( $args['label'] ); ?></span>
 		</button>

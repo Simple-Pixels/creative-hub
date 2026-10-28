@@ -281,6 +281,37 @@ function ch_rebuild_product_class_index() {
 }
 
 /**
+ * Featured image for a class: its own, or — when the class has none — the image of
+ * the first linked Studio Session product that has one.
+ *
+ * @param int          $class_id Class post ID.
+ * @param string|int[] $size     Image size.
+ * @return string <img> markup, or '' when neither has an image.
+ */
+function ch_class_thumbnail( $class_id, $size = 'medium_large' ) {
+	$class_id = absint( $class_id );
+	$html     = get_the_post_thumbnail( $class_id, $size );
+
+	if ( '' === $html ) {
+		foreach ( ch_get_class_product_ids( $class_id ) as $product_id ) {
+			$html = get_the_post_thumbnail( $product_id, $size );
+			if ( '' !== $html ) {
+				break;
+			}
+		}
+	}
+
+	/**
+	 * Filter the image shown for a class.
+	 *
+	 * @param string       $html     <img> markup ('' for none).
+	 * @param int          $class_id Class post ID.
+	 * @param string|int[] $size     Image size.
+	 */
+	return (string) apply_filters( 'ch_class_thumbnail', $html, $class_id, $size );
+}
+
+/**
  * Classes unlocked by a given product.
  *
  * @param int $product_id Product ID (parent product, not variation).

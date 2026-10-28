@@ -252,7 +252,7 @@ Options: `[ch_class_files label="Get the files"]`. Use `class_id="123"` to point
 - The name shown is the file's title in the Media Library; change it there if it reads badly.
 - The field names are filterable (`ch_class_files_repeater`, `ch_class_files_subfield`) if they ever change. If ACF is deactivated the files still work, because the plugin falls back to the data ACF saves.
 
-**In the Creative Hub.** No setup: each class card in *My classes* (My Account → Dashboard) gets a **Download** button beside "Open class" whenever the class has files, opening the same popup, so customers can grab their files without opening the class first. Classes with no files show no button.
+**In the Creative Hub.** No setup: each class card in *My classes* (My Account → Dashboard) gets a small square **Download** icon beside "Open class" whenever the class has files, opening the same popup, so customers can grab their files without opening the class first. Classes with no files show no icon. The cards are 3 across on desktop (2 on tablets, 1 on phones), and each card's image is the class's **Featured image**; if a class has none, the image of its linked Studio Session product is used instead (change it with the `ch_class_thumbnail` filter).
 
 **Who sees it**
 
@@ -311,6 +311,7 @@ Options: `[ch_class_files label="Get the files"]`. Use `class_id="123"` to point
 | `ch_curated_kit_image` | filter | The curated-kit image description |
 | `ch_gallery_items` | filter | The images `[ch_gallery]` is about to show |
 | `ch_class_files_repeater` / `ch_class_files_subfield` | filter | ACF repeater and file field names holding a product's class files (default `downloadable_files` / `class_file`) |
+| `ch_class_thumbnail` | filter | The image shown on a class card (class image, else its product's) |
 | `ch_class_files` | filter | The list of files offered for a class |
 | `ch_class_file_downloaded` / `ch_class_zip_downloaded` | action | After a class file / the zip is sent (user ID, class ID, and for a file the attachment ID) |
 | `ch_freebie_post_type` | filter | The post type `[ch_freebies]` lists (default `freebie`) |

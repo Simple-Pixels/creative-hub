@@ -5,7 +5,7 @@ Tested up to: 6.6
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 9.3
-Stable tag: 0.8.1
+Stable tag: 0.8.2
 License: GPLv2 or later
 
 Post-purchase members area for online classes, built on WooCommerce.
@@ -32,6 +32,15 @@ See SETUP.md in the plugin folder.
 4. Configure under Classes > Settings.
 
 == Changelog ==
+
+= 0.8.2 =
+* Creative Hub class cards redesigned: the pink block is now the class's featured image
+  (or, if the class has none, its Studio Session product's image), "Open class" is
+  smaller, and the Download button is a small square icon on the same row.
+* The class / retreat card grid is 3 across on desktop (2 on tablets, 1 on phones)
+  instead of 4.
+* Fixed: a card image with its own width and height could stretch the image area to the
+  image's full size instead of staying 4:3.
 
 = 0.8.1 =
 * The class cards in the Creative Hub (My Account → Dashboard) now have a Download

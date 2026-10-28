@@ -46,10 +46,35 @@ button.ch-btn.ch-cf__open:focus-visible {
 .ch-card button.ch-btn.ch-cf__open,
 .ch-card button.ch-btn.ch-cf__open:hover,
 .ch-card button.ch-btn.ch-cf__open:focus {
+	min-height: 40px !important;
 	margin: 0 !important;
-	padding: 12px !important;
-	font-size: 16px !important;
+	padding: 0 16px !important;
+	font-size: 14px !important;
 	text-transform: uppercase !important;
+}
+
+/* Icon only: a 40px square. The label stays in the markup as the accessible name. */
+button.ch-btn.ch-cf__open.ch-cf__open--icon,
+button.ch-btn.ch-cf__open.ch-cf__open--icon:hover,
+button.ch-btn.ch-cf__open.ch-cf__open--icon:focus {
+	flex: 0 0 auto;
+	width: 40px !important;
+	height: 40px !important;
+	min-height: 0 !important;
+	padding: 0 !important;
+	gap: 0 !important;
+}
+
+.ch-cf__open--icon span {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	margin: -1px;
+	padding: 0;
+	overflow: hidden;
+	clip: rect(0, 0, 0, 0);
+	white-space: nowrap;
+	border: 0;
 }
 
 /* ---------- Popup ---------- */

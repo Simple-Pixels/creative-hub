@@ -27,6 +27,8 @@ class CH_Class_Files {
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'register' ) );
 		add_action( 'wp_enqueue_scripts', array( __CLASS__, 'enqueue_early' ), 20 );
 		add_action( 'template_redirect', array( __CLASS__, 'maybe_download' ), 1 );
+
+		add_filter( 'woocommerce_customer_available_downloads', array( __CLASS__, 'add_to_account_downloads' ), 10, 2 );
 	}
 
 	/* --------------------------------------------------------------------- */
@@ -260,6 +262,88 @@ class CH_Class_Files {
 
 	protected static function zip_url( $class_id ) {
 		return add_query_arg( 'ch_class_zip', absint( $class_id ), home_url( '/' ) );
+	}
+
+	/* --------------------------------------------------------------------- */
+	/* WooCommerce My Account → Downloads                                     */
+	/* --------------------------------------------------------------------- */
+
+	/**
+	 * List a customer's class files in WooCommerce's own Downloads list (My Account → Downloads),
+	 * so they are there as well as in the Creative Hub. Each entry links to the same
+	 * access-checked endpoint as the class popup.
+	 *
+	 * @param array $downloads   Downloads WooCommerce found for the customer.
+	 * @param mixed $customer_id Customer (user) ID.
+	 * @return array
+	 */
+	public static function add_to_account_downloads( $downloads, $customer_id = 0 ): array {
+		$downloads   = is_array( $downloads ) ? $downloads : array();
+		$customer_id = absint( $customer_id );
+		if ( ! $customer_id ) {
+			return $downloads;
+		}
+
+		static $cache = array();
+		if ( ! isset( $cache[ $customer_id ] ) ) {
+			$cache[ $customer_id ] = self::account_download_entries( $customer_id );
+		}
+
+		return array_merge( $downloads, $cache[ $customer_id ] );
+	}
+
+	/**
+	 * Downloads-list entries (the shape WooCommerce uses) for each class a customer has bought.
+	 *
+	 * @param int $customer_id Customer (user) ID.
+	 * @return array[]
+	 */
+	protected static function account_download_entries( int $customer_id ): array {
+		$purchased = CH_Entitlements::instance()->get_purchased_product_ids( $customer_id );
+		$entries   = array();
+
+		foreach ( ch_get_user_class_ids( $customer_id ) as $class_id ) {
+			if ( 'publish' !== get_post_status( $class_id ) ) {
+				continue;
+			}
+
+			$files = self::get_files( $class_id );
+			if ( ! $files ) {
+				continue;
+			}
+
+			// The product they bought that unlocks this class, so the hub groups the files by class.
+			$bought     = array_values( array_intersect( ch_get_class_product_ids( $class_id ), $purchased ) );
+			$product_id = $bought ? (int) $bought[0] : 0;
+			$title      = wp_strip_all_tags( get_the_title( $class_id ) );
+
+			foreach ( $files as $file ) {
+				$entries[] = array(
+					'download_url'        => self::file_url( $class_id, $file['id'] ),
+					'download_id'         => 'ch-' . $class_id . '-' . $file['id'],
+					'product_id'          => $product_id,
+					'product_name'        => $title,
+					'product_url'         => get_permalink( $class_id ),
+					'download_name'       => $file['name'],
+					'order_id'            => 0,
+					'order_key'           => '',
+					'downloads_remaining' => '',
+					'access_expires'      => null,
+					'file'                => array(
+						'name' => $file['name'],
+						'file' => $file['filename'],
+					),
+				);
+			}
+		}
+
+		/**
+		 * Filter the class files added to My Account → Downloads.
+		 *
+		 * @param array[] $entries     Entries in WooCommerce's downloads format.
+		 * @param int     $customer_id Customer (user) ID.
+		 */
+		return (array) apply_filters( 'ch_account_downloads', $entries, $customer_id );
 	}
 
 	/* --------------------------------------------------------------------- */

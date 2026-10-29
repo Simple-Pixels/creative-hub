@@ -2,7 +2,7 @@
 /**
  * Plugin Name:       Creative Hub
  * Description:        Post-purchase members area for online classes. Adds a "Classes" content type (Elementor-editable), links classes to Studio Sessions products, gates class pages by purchase, and gives customers a tidy view of what they own.
- * Version:           0.8.3
+ * Version:           0.8.4
  * Requires at least:  6.2
  * Requires PHP:       7.4
  * Author:            Scrapping Clearly
@@ -15,7 +15,7 @@
 
 defined( 'ABSPATH' ) || exit;
 
-define( 'CH_VERSION', '0.8.3' );
+define( 'CH_VERSION', '0.8.4' );
 define( 'CH_FILE', __FILE__ );
 define( 'CH_PATH', plugin_dir_path( __FILE__ ) );
 define( 'CH_URL', plugin_dir_url( __FILE__ ) );

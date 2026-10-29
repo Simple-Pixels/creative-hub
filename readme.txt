@@ -5,7 +5,7 @@ Tested up to: 6.6
 Requires PHP: 7.4
 WC requires at least: 7.0
 WC tested up to: 9.3
-Stable tag: 0.8.3
+Stable tag: 0.8.4
 License: GPLv2 or later
 
 Post-purchase members area for online classes, built on WooCommerce.
@@ -32,6 +32,11 @@ See SETUP.md in the plugin folder.
 4. Configure under Classes > Settings.
 
 == Changelog ==
+
+= 0.8.4 =
+* Class files now also appear in WooCommerce's own My Account → Downloads list (one row
+  per file, the class as the "product"), as well as in the Creative Hub. They use the same
+  access-checked download links as the class popup.
 
 = 0.8.3 =
 * Fixed: a retreat booking's "Paid so far" showed only the deposit, ignoring instalments

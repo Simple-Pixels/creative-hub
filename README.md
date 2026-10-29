@@ -5,7 +5,7 @@
 | | |
 | --- | --- |
 | Type | Site-specific (Scrapping Clearly) |
-| Version | 0.8.3 (`CH_VERSION` + plugin header + `readme.txt` stable tag) |
+| Version | 0.8.4 (`CH_VERSION` + plugin header + `readme.txt` stable tag) |
 | Main file | `creative-hub.php` |
 | Text domain | `creative-hub` |
 | Prefix | `CH_` (classes, constants), `ch_` (functions, options, hooks, shortcodes, query vars), `_ch_` (meta), `ch-` (handles, CSS) |
@@ -158,6 +158,7 @@ The full list (about 30 filters and actions) is in [SETUP.md → Developer hooks
 | `ch_studio_session_term` / `ch_studio_session_taxonomies` | filter | What makes a product able to unlock classes. |
 | `ch_retreat_payment_summary` | filter | Retreat card figures (adjust here if the deposits plugin data differs). |
 | `ch_freebie_downloaded`, `ch_class_file_downloaded`, `ch_class_zip_downloaded` | action | After a download (e.g. newsletter sync, logging). |
+| `ch_account_downloads` | filter | Class files added to My Account → Downloads (WooCommerce downloads format). |
 
 ## Gotchas
 
@@ -166,6 +167,7 @@ The full list (about 30 filters and actions) is in [SETUP.md → Developer hooks
 - **Only `studio-sessions` products unlock.** Removing the term from a product immediately stops it unlocking classes. Curated Kits and Kit Classes are normal products.
 - **Retreat balances were built from the deposits plugin's published data structure**, not a live order. Check figures on a real deposit booking after updating that plugin; `ch_retreat_payment_summary` is the one place to fix them.
 - **Media Library files are still public.** Downloads are gated, but anyone who knows or guesses a direct upload URL can open it.
+- **Class files are injected into WooCommerce's downloads list** through `woocommerce_customer_available_downloads` (so My Account → Downloads and `[ch_my_downloads]` both show them). Entries have no order (`order_id` 0), unlimited downloads and no expiry; anything else reading that list sees them too.
 - **The `freebie` post type isn't registered here.** If it's missing, `[ch_freebies]` shows editors a notice and visitors nothing.
 - **Block-based My Account** isn't supported for the Dashboard hub. Use `[creative_hub]` on a page instead.
 - **Kinsta caching.** The Access page uses `?ch_class=`. If buy links look stale, exclude that page from cache. After CSS/JS changes, clear WP Rocket and Kinsta caches.
@@ -181,4 +183,4 @@ The full list (about 30 filters and actions) is in [SETUP.md → Developer hooks
 
 ## Changelog
 
-See [readme.txt](readme.txt). Latest: **0.8.3**, fixed "Paid so far" on retreat bookings with a deposit.
+See [readme.txt](readme.txt). Latest: **0.8.4**, class files also appear in My Account → Downloads.

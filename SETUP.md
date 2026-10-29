@@ -254,6 +254,8 @@ Options: `[ch_class_files label="Get the files"]`. Use `class_id="123"` to point
 
 **In the Creative Hub.** No setup: each class card in *My classes* (My Account → Dashboard) gets a small square **Download** icon beside "Open class" whenever the class has files, opening the same popup, so customers can grab their files without opening the class first. Classes with no files show no icon. The cards are 3 across on desktop (2 on tablets, 1 on phones), and each card's image is the class's **Featured image**; if a class has none, the image of its linked Studio Session product is used instead (change it with the `ch_class_thumbnail` filter).
 
+**In My Account → Downloads.** No setup: every file for the classes a customer has bought is also listed in WooCommerce's own **Downloads** tab, one row per file, with the class name in the Product column and the file name on the button. The links are the same access-checked ones as the popup, with unlimited downloads and no expiry. Customers will see these rows (and the files in the *My downloads* part of the Creative Hub) even though the products aren't set up as WooCommerce "downloadable" products.
+
 **Who sees it**
 
 - The button only appears for people who can open the class (buyers, and staff with Staff preview on). On any other page, or for anyone else, it prints nothing.
@@ -313,6 +315,7 @@ Options: `[ch_class_files label="Get the files"]`. Use `class_id="123"` to point
 | `ch_class_files_repeater` / `ch_class_files_subfield` | filter | ACF repeater and file field names holding a product's class files (default `downloadable_files` / `class_file`) |
 | `ch_class_thumbnail` | filter | The image shown on a class card (class image, else its product's) |
 | `ch_class_files` | filter | The list of files offered for a class |
+| `ch_account_downloads` | filter | Class files added to My Account → Downloads (WooCommerce's downloads format) |
 | `ch_class_file_downloaded` / `ch_class_zip_downloaded` | action | After a class file / the zip is sent (user ID, class ID, and for a file the attachment ID) |
 | `ch_freebie_post_type` | filter | The post type `[ch_freebies]` lists (default `freebie`) |
 | `ch_freebie_preview_size` | filter | Image size shown as the preview (default `medium_large`) |
